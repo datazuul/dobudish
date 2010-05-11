@@ -1,0 +1,887 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- This file is part of DobuDish                                           -->
+
+<!-- DobuDish is free software; you can redistribute it and/or modify        -->
+<!-- it under the terms of the GNU General Public License as published by    -->
+<!-- the Free Software Foundation; either version 2 of the License, or       -->
+<!-- (at your option) any later version.                                     -->
+
+<!-- DobuDish is distributed in the hope that it will be useful,             -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of          -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           -->
+<!-- GNU General Public License for more details.                            -->
+
+<!-- You should have received a copy of the GNU General Public License       -->
+<!-- along with DobuDish; if not, write to the Free Software                 -->
+<!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA -->
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+    <!ENTITY % global.entities SYSTEM "../../../system/custom-xsl/global-entities.xml">
+    %global.entities;
+
+    <!ENTITY % entities SYSTEM "../custom-cfg/local-entities.xml">
+    %entities;
+  ]>
+<article lang="en">
+  <articleinfo>
+    <title>&dobudish; User Manual</title>
+    <copyright>
+      <year>2006-2008</year>
+      <holder>AGYNAMIX</holder>
+    </copyright>
+    <releaseinfo>Version &docversion;</releaseinfo>
+    <revhistory>
+      <revision>
+        <revnumber>1.0</revnumber>
+        <date>22.11.2006</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Initial Revision</revremark>
+      </revision>
+      <revision>
+        <revnumber>1.1</revnumber>
+        <date>31.12.2006</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Added new output formats. More description</revremark>
+      </revision>
+      <revision>
+        <revnumber>1.2</revnumber>
+        <date>05.01.2007</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Changed property substitution mechanism.</revremark>
+      </revision>
+      <revision>
+        <revnumber>1.3</revnumber>
+        <date>10.07.2007</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Added a table of available build target hooks.</revremark>
+      </revision>
+      <revision>
+        <revnumber>1.4</revnumber>
+        <date>13.02.2008</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Description of new Website feature.</revremark>
+      </revision>
+    </revhistory>
+    <abstract>
+      <title>Overview</title>
+      <para>This manual describes the usage of &dobudish; from a user&apos;s point of view.</para>
+    </abstract>
+  </articleinfo>
+  <para/>
+  <sect1>
+    <title>Introduction</title>
+    <para>
+    &dobudish; is a flexible Docbook publishing tool chain. It is build upon the Java&reg; programming language. 
+    That means you can use it on all systems that are supported by Java&reg;, 
+    for instance Windows&reg;, MacOS&reg; X and Linux&trade;.
+  </para>
+    <para>
+    &dobudish; itself is just a script that glues together some of the best freely available tools that are needed
+    to process Docbook. These are for instance (in no particular order):
+    <itemizedlist>
+        <listitem>
+          <para>Apache FOP: used to generate PDF output</para>
+        </listitem>
+        <listitem>
+          <para>Saxon XSL Processor: Saxon is used to process the Docbook XML file and transform it
+      into the many other output formats.</para>
+        </listitem>
+        <listitem>
+          <para>Apache FOP: used to generate PDF output</para>
+        </listitem>
+      </itemizedlist>
+  </para>
+  </sect1>
+  <sect1>
+    <title>Prerequisites</title>
+    <para>
+    &dobudish; has been extensively tested on Windows&reg; XP. It should also work without problems on Windows&reg; 2000.
+    Others run &dobudish; successfully on Mac OS X or Linux systems such as Ubuntu. 
+  </para>
+    <para>
+    Please report any success or failure of running &dobudish; on different &mswindows; or &unix; versions.
+  </para>
+    <para>
+    &dobudish; comes bundled with the Java&trade; JRE Version 5 for Windows&reg; If you use it on Unix&trade; 
+    you need to supply your own Java&trade; version. Having Java&trade; 5 or above should be ok.
+  </para>
+  </sect1>
+  <sect1 id="sect1.features">
+    <title>Features</title>
+    <para>
+    The &dobudish; framework supports the creation of the following document types:
+  </para>
+    <itemizedlist>
+      <listitem>
+        <para><emphasis role="bold">html</emphasis>: creates chunked html output</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">singlehtml</emphasis>: creates one big single html file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">xhtml: </emphasis>create a single page html file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">singlexhtml: </emphasis>create a single page html file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">manpages: </emphasis>create a single page html file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">wordml: </emphasis>create a WordML file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">htmlhelp: </emphasis>create a Windows Help (CHM) file</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">eclipse: </emphasis>create an Eclipse Help plugin (together with toc.xml and plugin.xml)</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">javahelp</emphasis>: formats the output in JavaHelp format.     
+      Double clicking on the JAR file opens the JavaHelp browser which is included in the distribution.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">tablehtml</emphasis>(Slides): Create a Slides document with tabular html</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">framehtml</emphasis>(Slides): Create a Slides html document with a frameset</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">tablexhtml</emphasis>(Slides): Create a Slides document with tabular xhtml</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">framexhtml</emphasis>(Slides): Create a Slides xhtml document with a frameset</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">pdf</emphasis>: Create PDF files suitable for printing.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis>rtf</emphasis>: Create RTF files<footnote>
+            <para>To use this file type you need to
+    download <emphasis>xfc</emphasis> from <ulink url="http://www.xmlmind.com/xmleditor/addons.shtml">XMLMind&apos;s website</ulink>.
+    You are allowed to use XFC for personal use, therefore it&apos;s not included in &dobudish; by default.
+    Create a directory <emphasis>xfc</emphasis> inside the &dobudish; <emphasis>system</emphasis> directory 
+    and copy the following jar files into it: <emphasis>jaxp.jar, regexp.jar, sax.jar, xfc.jar and xp.jar</emphasis>.
+    After that you should be able to produce RTF documents.</para>
+          </footnote>
+    </para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">ws-tab</emphasis>: Create a tabular website.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">website</emphasis>: Create a non tabular website.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">validate: </emphasis>Validate the input docbook file. This
+      is not really a document type but give&apos;s you a way to check if your documents are valid.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">distribute: </emphasis>export the Docbook input files into a ZIP archive</para>
+      </listitem>
+    </itemizedlist>
+    <para>In addition to these, &dobudish; features:</para>
+    <itemizedlist>
+      <listitem>
+        <para>Catalogs are resolved: Docbook documents can keep the official Docbook DTD URL as System ID.
+      These are mapped to locally stored DTD files contained in the &dobudish; installation.
+    </para>
+      </listitem>
+      <listitem>
+        <para>Support for XInclude: Documents can be modularized using the XInclude mechanism.
+    Prior to transforming the document into its target format, a special stylesheet creates a docbook file
+    that contains all modules. This files can be checked for validity.</para>
+      </listitem>
+      <listitem>
+        <para>Additional font support: Additional fonts are available for documents. For instance,
+    the customization layer sets &lquote;Georgia&rquote; as the default title font.</para>
+      </listitem>
+      <listitem>
+        <para>Included JRE: For your convinience the install archive contains the Java&reg; JRE
+    that is used on Windows&reg;. That we you will not run into situations that result from 
+    old or unsupported JRE&apos;s.</para>
+      </listitem>
+      <listitem>
+        <para>Flexible customization layer: the customization layer supports global 
+    modifications (available to all documents) and local modifications (only for selected documents)</para>
+      </listitem>
+      <listitem>
+        <para>Adaptable build process: You may need to run extra processes that produce parts of your
+    Docbook document. Maybe you need to parse some plain text files, extract contents and include this
+    into your documents- you can plug these steps into the document build process. This way everything
+    is generated using one command.</para>
+      </listitem>
+      <listitem>
+        <para>Property resolution: You can define properties through key / value pairs in
+    the global build.properties or in the document local localbuild.properties file. After enabling
+    property resolution (disabled by default) in your docbook document you can write something like
+    <computeroutput>\$ant.get(&quot;document.version&quot;)</computeroutput> and it will be replaced with the corresponding
+    value from the properties files.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+  <sect1>
+    <title>Installation</title>
+    <para>
+    Installation of &dobudish; is dead simple:
+  </para>
+    <para>
+    From our <ulink url="http://www.agynamix.de">website</ulink> 
+    (the freeware section of our <ulink url="http://cms.agynamix.de/downloads/index.php">download area</ulink>)
+    you can download the latest version. Please save it to a convinient directory of your absolutely personal choice
+    (<emphasis>Programm Files</emphasis> for instance). Unzip the archiv with an Unzip utility (also of your choice)
+    into this directory.
+    Windows XP includes an unzip utility. If you need an unzip tool just google for &lquote;7-Zip&rquote;, 
+    &lquote;PowerArchiver&rquote; or any other unzipper.
+  </para>
+    <para>
+    You&apos;re done. Finish. No next step. Rejoice.
+  </para>
+    <para>To test your installation, do the following:</para>
+    <para>Open up a cmd shell (DOS command window), change the directory into the &dobudish; installation directory
+  and issue the following commands:</para>
+    <para>
+    <programlisting>
+generator.bat fluff create book
+generator.bat fluff pdf  
+    </programlisting>
+  </para>
+    <para>
+    The first command creates the <emphasis>documents</emphasis> directory and the directory 
+    <emphasis>fluff</emphasis> inside of it. <emphasis>fluff</emphasis> is actually the name of the
+    book you just created. Inside the <emphasis>fluff</emphasis> directory you will find a file
+    <emphasis>fluff.xml</emphasis> which is a docbook template meant to get you started quickly.
+    (I hate starting with a blank page. So I always copy some skeleton and modify this. That
+    takes the pain of having to start with nothing. If you&apos;re like me use this template. Of course
+    you can always throw the template away and start the book on your own. Although it would hurt
+    my feelings :)
+  </para>
+    <para>
+    The second command transforms the provided book template into PDF.
+  </para>
+    <para>The resulting PDF file can be found in <emphasis>documents/fluff/output/pdf</emphasis>.</para>
+  </sect1>
+  <sect1>
+    <title>Working with &dobudish;</title>
+    <sect2>
+      <title>Available File Formats</title>
+      <para>
+      For the technical minded, &dobudish; is driven by Apache Ant under the hood. In an Ant script (which
+      actually is much like a Makefile you might know from the C programming world) you have a set of 
+      <emphasis>targets</emphasis>. Each <emphasis>target</emphasis> executes certain steps to fullfill
+      its duty. The pdf target for instance creates first the output folder, it will then merge all XIncluded
+      document fragments into one big file and calls the Docbook stylesheets to process this file into a
+      Formatting Object (.fo) file. That again is given to <emphasis>Apache FOP</emphasis>, which creates
+      beautiful PDF from it. I agree, the resulting PDF is not yet as beautiful as LateX would create it,
+      but we&apos;re working on it...
+    </para>
+      <para>
+      So to let &dobudish; do some work you have to call the <emphasis>generator</emphasis> script. Depending on
+      your operation system you call <emphasis>generator.bat</emphasis> (Windows&reg;) or 
+      <emphasis>generator.sh</emphasis> (Unix&trade;). The syntax of this command is the following:
+      <programlisting>
+generator.bat &lt;document-name&gt; &lt;file-type&gt;
+
+for instance
+
+generator.bat fluff pdf  [or]
+generator.sh  fluff pdf
+      </programlisting>         
+    </para>
+      <para>
+      To issue any &dobudish; command you have to be in the &dobudish; root directory, for instance
+      <emphasis>C:\Program Files\dobudish</emphasis>. Open a command shell (on Windows&reg; click the &lquote;start&rquote;
+      button, click &lquote;Execute&rquote; and type <emphasis>cmd</emphasis>, press &lquote;Enter&rquote;. 
+      This will open a command window. There type <emphasis>cd C:\Program Files\dobudish</emphasis> (substitute 
+      <emphasis>Program Files</emphasis> with the install directory you&apos;ve chosen. You also might need to change the
+      drive from <emphasis>C:</emphasis> to <emphasis>D:</emphasis> for instance. To do this type <emphasis>D:</emphasis>
+      in the command window.
+    </para>
+      <para>
+      Please see <xref linkend="sect1.features"/> for the available document formats or type
+      <computeroutput>generator.bat help</computeroutput> to display a list of available targets.
+    </para>
+    </sect2>
+    <sect2>
+      <title>Including Media objects</title>
+      <para>
+      If you have a directory <emphasis>resource</emphasis> right in the <emphasis>input</emphasis> directory of
+      your document, then this document with all its content is copied over to the output directory.
+      This is useful if you want to include images into your documents- put them into the 
+      <emphasis>resource</emphasis> directory and the build process will automatically take care of them.
+    </para>
+      <para>
+      You reference included images like this:
+      <programlisting>
+&lt;mediaobject&gt;
+  &lt;imageobject&gt;
+    &lt;imagedata fileref=&quot;resource/cover.jpg&quot; format=&quot;JPG&quot;/&gt;
+  &lt;/imageobject&gt;
+&lt;/mediaobject&gt;
+</programlisting>
+    </para>
+    </sect2>
+    <sect2>
+      <title>Special project directories</title>
+      <para>
+      There are some directories in a project directory that are handled specially:
+      <itemizedlist>
+          <listitem>
+            <para><emphasis>custom-cfg/common-files</emphasis>: If this directory is present then
+          it&apos;s content is preferred over the global common-files directories (there&apos;s one for article/book/set,
+          slides or website).</para>
+          </listitem>
+          <listitem>
+            <para><emphasis>input/resource</emphasis>: If this directory is present then
+          it is copied entirely to <emphasis>output/resource</emphasis>. This is the old style.
+          It is preferred to use the next directory.</para>
+          </listitem>
+          <listitem>
+            <para><emphasis>input/copy_to_output</emphasis>: If this directory is present then
+          <emphasis role="bold">it&apos;s content</emphasis> is copied entirely and recursively to 
+          <emphasis>output</emphasis>. This is the preferred way to copy data to the output directory
+          that does not need be processed by stylesheets but should be part of the output. 
+          </para>
+          </listitem>
+        </itemizedlist>
+    </para>
+    </sect2>
+    <sect2>
+      <title>Multiple documents in one document directory</title>
+      <para>
+      The assumption &dobudish; is making is that the directory (or project) you create with 
+      <computeroutput>generator.bat fluff create book</computeroutput> is also the name of the
+      document, <emphasis>fluff.xml</emphasis>.
+    </para>
+      <para>
+      Now there is an extension to this assumption. Maybe you have a directory containing XInclude&apos;d
+      document fragments that you use in different master documents. Or maybe you are writing a revision
+      history document along with your master source. Let&apos;s assume the revision document is called 
+      <emphasis>revhistory.xml</emphasis> (the <emphasis>.xml</emphasis> at the end is still
+      mandatory) and let&apos;s assume, this document is part of the <emphasis>fluff</emphasis> project, 
+      you can now generate this document using the following command:
+      <programlisting>
+generator.bat fluff pdf revhistory
+      </programlisting>
+      This will tell &dobudish; to look at the <emphasis>fluff</emphasis> project (directory), generate a
+      <emphasis>pdf</emphasis> document, but won&apos;t take <emphasis>fluff.xml</emphasis> as the input document
+      but rather <emphasis>revhistory.xml</emphasis>. The resulting document will be called... ...tam tam...
+      ...<emphasis>revhistory.pdf</emphasis>.
+    </para>
+      <para>
+      The usual way works as ever- if you omit the last parameter, then &dobudish; will assume the source
+      document is of the same name as the document directory (plus .xml).
+    </para>
+      <para>
+      One drawback though is that the output directory will be cleared each time you generate one of the documents
+      of one directory. So you need to move a previously generated document somewhere else if you want to keep it.
+    </para>
+      <para>
+      I&apos;m open for suggestions...
+    </para>
+    </sect2>
+    <sect2>
+      <title>Creating Docbook Slides</title>
+      <para>
+       Since version 0.9.9 of &dobudish; you can use the <emphasis role="bold">Docbook Slides</emphasis> document type.
+       You can create the following output formats:
+       <itemizedlist>
+          <listitem>
+            <para>pdf</para>
+          </listitem>
+          <listitem>
+            <para>html</para>
+          </listitem>
+          <listitem>
+            <para>tablehtml</para>
+          </listitem>
+          <listitem>
+            <para>framehtml</para>
+          </listitem>
+          <listitem>
+            <para>xhtml</para>
+          </listitem>
+          <listitem>
+            <para>tablexhtml</para>
+          </listitem>
+          <listitem>
+            <para>framexhtml</para>
+          </listitem>
+        </itemizedlist>
+     </para>
+      <para>
+       To create a Slides document, create a template like this:
+       <programlisting>
+   generator.bat fluffyslides create slides
+       </programlisting>
+       Then, you create output as usual:
+       <programlisting>
+   generator.bat fluffyslides tablehtml
+       </programlisting>
+     </para>
+    </sect2>
+    <sect2>
+      <title>Creating Docbook Websites</title>
+      <para>
+       &dobudish; latest addition since version 0.9.14 is the ability to create <emphasis role="bold">Docbook Website</emphasis>
+       documents. Tabular chunked as well as non tabular chunked output formats are supported.
+     </para>
+      <para>
+       To demonstrate the use of Website documents the example which came with the website xsl distribution
+       was incorporated as a &dobudish; template.
+     </para>
+      <para>
+       To create a Website project you would type:
+       <programlisting>
+   generator.bat fluffyweb create website       
+       </programlisting>
+       This will copy the website example as your new project. Please note that a file &quot;fluffyweb.xml&quot;
+       is created. This is only needed for the generator to determine the type of the project. Other than that 
+       it is just a dummy file.
+     </para>
+      <para>
+       The head file for a website project is the file &quot;layout.xml&quot;. This file is used to
+       create &quot;autolayout.xml&quot; which in turn is fed to the tabular or non tabular website
+       driver stylesheets.
+     </para>
+      <para>
+       To create a tabular website, type:
+       <programlisting>
+   generator.bat fluffyweb ws-tab
+       </programlisting>
+     </para>
+      <para>
+       To create a non tabular website, type:
+       <programlisting>
+   generator.bat fluffyweb website
+       </programlisting>
+     </para>
+    </sect2>
+    <sect2>
+      <title>Validating your document</title>
+      <para>
+       You might want to check if your document conforms to the Docbook DTD. You can do this with the 
+       <emphasis>validate</emphasis> command:
+       <programlisting>generator.bat &lt;document-name&gt; validate</programlisting>
+       Any validation errors that the parser finds are reported in the console windows where you
+       issued the command.
+     </para>
+    </sect2>
+    <sect2>
+      <title>Substituting Properties</title>
+      <para>
+       Often you have several values that you don&apos;t want to write scattered throughout a document. 
+       You rather want to define a value in one place and reference it whereever necessary.
+     </para>
+      <para>
+       One way to do this is to use entities. That&apos;s fine as long as you need the value only within a
+       document and don&apos;t want to set it from outside.
+     </para>
+      <para>
+       &dobudish; has enhanced that mechanism. You can now set an entity&apos;s value by referencing any property
+       variable that is known to the build process (every variable defined in the global build.properties, the
+       document local localbuild.properties or in the build process directly.
+     </para>
+      <para>To enable property substitution for a document or globally, set the variable
+     <computeroutput>substitute.properties=yes</computeroutput>. If you do this in the custom-cfg
+     directory of your document, you will enable property substitution only for the documents in this
+     directory. If you want to enable property substitution globally you need to set it in the global 
+     property file &quot;build.properties&quot;
+     </para>
+      <para>After you have enabled property substitution you can write something like this:
+     <programlisting>
+&lt;!ENTITY docversion      &quot;\$ant.get(&quot;document.version&quot;) &quot;&gt;
+     </programlisting>
+     The property ist retrieved by the term <emphasis role="bold"> $ant.get(&quot;PropertyName&quot;)</emphasis>
+     where <emphasis>PropertyName</emphasis> is the name of a property from the Properties files or from
+     inside Ant. 
+     </para>
+      <para>Later in the document, you can reference it via &amp;docversion; which will result in
+     $ant.get(&quot;document.version&quot;).</para>
+      <para>
+     &dobudish; uses VPP (Velocity PreProcessor) as substitution engine. So if you&apos;d like to script your
+     Docbook document a bit you can use all the mechanisms that are supported by Velocity. For a reference
+     please see <ulink url="http://jakarta.apache.org/velocity/"/>.
+     </para>
+    </sect2>
+    <sect2>
+      <title>Distributing your document source</title>
+      <para>
+       There are cases where you might need to send your document sources to someone. &dobudish; provides a target called
+       <emphasis>distribute</emphasis> used to zip all pieces of one document into one ZIP archive. The archive name
+       contains the version of the document which can be set modifying <emphasis>document.version</emphasis> in
+       <emphasis>localbuild.properties</emphasis>. To create an archive of your document use the following command:
+       <programlisting>
+generator.bat &lt;document-name&gt; distribute
+       </programlisting>
+       This will build a file <emphasis>&lt;document-name&gt;-&lt;document.version&gt;.zip</emphasis> stored in
+       your documents root directory (<emphasis>documents/&lt;document-name&gt;</emphasis>.       
+     </para>
+    </sect2>
+  </sect1>
+<!-- 
+<sect1><title>Suggested Work environment</title>
+
+  <para>
+    To be done.
+  </para>
+
+</sect1>
+-->  <sect1>
+    <title>Modifiying the Customization Layer</title>
+    <para>
+    The cutomization layer is flexible enough to function with no modifications at all, modifications on an
+    installation wide level and/or modifications on a per document basis.
+  </para>
+    <para>
+    To modify the customization layer globally, please look into the <emphasis>custom-xsl</emphasis> directory
+    within the &dobudish; <emphasis>system</emphasis> directory. The <emphasis>manual</emphasis> directory
+    contains valuable information about how you can customize the Docbook layout.
+  </para>
+    <para>
+    To modify the customization layer on a per document basis you need to adapt the stylesheets in the
+    <emphasis>custom-cfg</emphasis> directory of your document.
+    You modify those stylesheets the same way you would do with the global ones, they are just imported into
+    the build process before the global ones, so if you define something there, it essentially overwrites
+    the global settings.
+  </para>
+  </sect1>
+  <sect1>
+    <title>Extending the build process</title>
+    <para>
+    Now, this is for geeks only :)
+  </para>
+    <para>
+    You are a geek, right?
+  </para>
+    <para>
+    To extend the build process you follow these steps. First look into <emphasis>localbuild.xml</emphasis> in
+    the <emphasis>custom-cfg</emphasis> directory of your document. It is an Ant file with some empty targets
+    included. The targets there follow the simple naming scheme <emphasis>local-pre-&lt;real target&gt;&gt;</emphasis>
+    and <emphasis>local-post-&lt;real target&gt;</emphasis>. You need to check where you want to plug your own extensions
+    into. If you need to generate some sources, then the <emphasis>local-post-init</emphasis> target might be right
+    for you. Please consult the <ulink url="http://ant.apache.org">Ant website</ulink> for any help.
+  </para>
+  </sect1>
+  <sect1>
+    <title>Variables of the Build Process</title>
+    <para>
+    Build time properties are stored in the file <emphasis>localbuild.properties</emphasis> in the 
+    <emphasis>custom-cfg</emphasis> directory of your document. Here is a snapshot of that file for
+    the &dobudish; manual (sourced into the manual via XInclude):
+  </para>
+    <para>
+    <programlisting>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../custom-cfg/localbuild.properties" parse="text"/>
+    </programlisting>
+  </para>
+    <para>Global properties are found in a file called <emphasis>build.properties</emphasis> in
+  the root directory of &dobudish;. It contains the following entries. If an entry occurs in both the global
+  and the document local property file then the local value overwrites the global one. Of course.</para>
+    <para>
+    <programlisting>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build.properties" parse="text"/>
+    </programlisting>
+  </para>
+  </sect1>
+  <sect1>
+    <title>Using Build Hooks to customize the document generation</title>
+  </sect1>
+  <para>
+    The build process is based on Apache Ant (a kind of <emphasis>make</emphasis> for Java). With Ant you have <emphasis>targets</emphasis>
+    which you call in order for Ant to perform several steps that would lead to the result of this target. <emphasis>PDF</emphasis> for instance,
+    is an Ant target. So when you call <computeroutput>generator.bat fluff pdf</computeroutput> it will internally call a target called <emphasis>pdf</emphasis>. 
+  </para>
+  <para>
+    To give you some flexibility with the build process I have incorporated some hooks into the chain of executed commands. A hook is basically an Ant target.
+    If it&apos;s there it will be executed. If it is missing it&apos;s simply skipped. In your document&apos;s folder there is a folder called <emphasis>custom-cfg</emphasis>, 
+    within that you find a file <emphasis>localbuild.xml</emphasis> which is the place to add these hooks. Following is a table showing you all the available
+    hook targets together with a small explanation when they&apos;re called. If you&apos;re curious you can look into the build file 
+    <emphasis>system/etc/build-output-formats.xml</emphasis> where they&apos;re referenced.
+  </para>
+  <informaltable frame="all">
+    <tgroup cols="2" colsep="1" rowsep="1" align="left">
+      <colspec colnum="1" colwidth="0.5*"/>
+      <colspec colnum="2"/>
+      <thead>
+        <row>
+          <entry align="left">
+            <emphasis role="bold">Hook Target</emphasis>
+          </entry>
+          <entry align="left">
+            <emphasis role="bold">Descripton</emphasis>
+          </entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>local-pre-init</entry>
+          <entry>before initialization starts</entry>
+        </row>
+        <row>
+          <entry>local-post-init</entry>
+          <entry>after initialization finished</entry>
+        </row>
+        <row>
+          <entry>local-pre-resolve-xinclude</entry>
+          <entry>before the <emphasis>resolve-xinclude</emphasis> target. This target is called before the actual targets that generate things in order to slurp all document snippets together into one.</entry>
+        </row>
+        <row>
+          <entry>local-post-resolve-xinclude</entry>
+          <entry>after the <emphasis>resolve-xinclude</emphasis> target. This target is called before the actual targets that generate things in order to slurp all document snippets together into one.</entry>
+        </row>
+        <row>
+          <entry>local-pre-singlehtml</entry>
+          <entry>before the <emphasis>singlehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-singlehtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>singlehtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-singlehtml</entry>
+          <entry>after the <emphasis>singlehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-singlexhtml</entry>
+          <entry>before the <emphasis>singlexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-singlexhtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>singlexhtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-singlexhtml</entry>
+          <entry>after the <emphasis>singlexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-javahelp</entry>
+          <entry>before the <emphasis>javahelp</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-jar-javahelp</entry>
+          <entry>before the <emphasis>jar</emphasis> target for <emphasis>javahelp</emphasis>. Called before the generated files ar packaged as JAR.</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-javahelp</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>javahelp</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-javahelp</entry>
+          <entry>after the <emphasis>javahelp</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-eclipse</entry>
+          <entry>before the <emphasis>eclipse</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-jar-eclipse</entry>
+          <entry>before the <emphasis>jar</emphasis> target for <emphasis>eclipse</emphasis>. Called before the generated files ar packaged as JAR.</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-eclipse</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>eclipse</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-eclipse</entry>
+          <entry>after the <emphasis>eclipse</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-html</entry>
+          <entry>before the <emphasis>html</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-html</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>html</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-html</entry>
+          <entry>after the <emphasis>html</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-tablehtml</entry>
+          <entry>before the <emphasis>tablehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-tablehtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>tablehtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-tablehtml</entry>
+          <entry>after the <emphasis>tablehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-framehtml</entry>
+          <entry>before the <emphasis>framehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-framehtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>framehtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-framehtml</entry>
+          <entry>after the <emphasis>framehtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-xhtml</entry>
+          <entry>before the <emphasis>xhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-xhtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>xhtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-xhtml</entry>
+          <entry>after the <emphasis>xhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-tablexhtml</entry>
+          <entry>before the <emphasis>tablexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-tablexhtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>tablexhtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-tablexhtml</entry>
+          <entry>after the <emphasis>tablexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-framexhtml</entry>
+          <entry>before the <emphasis>framexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-framexhtml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>framexhtml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-framexhtml</entry>
+          <entry>after the <emphasis>framexhtml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-htmlhelp</entry>
+          <entry>before the <emphasis>htmlhelp</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-hhc-htmlhelp</entry>
+          <entry>before the <emphasis>hhc</emphasis> target for <emphasis>htmlhelp</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-htmlhelp</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>htmlhelp</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-htmlhelp</entry>
+          <entry>after the <emphasis>htmlhelp</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-pdf</entry>
+          <entry>before the <emphasis>pdf</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-pdf</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>pdf</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-pdf</entry>
+          <entry>after the <emphasis>pdf</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-rtf</entry>
+          <entry>before the <emphasis>rtf</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-rtf</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>rtf</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-rtf</entry>
+          <entry>after the <emphasis>rtf</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-wordml</entry>
+          <entry>before the <emphasis>wordml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-wordml</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>wordml</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-wordml</entry>
+          <entry>after the <emphasis>wordml</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-manpages</entry>
+          <entry>before the <emphasis>manpages</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-manpages</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>manpages</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-manpages</entry>
+          <entry>after the <emphasis>manpages</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-fo</entry>
+          <entry>before the <emphasis>fo</emphasis> target. FO is generated from Docbook source prior to generating pdf with Apache FOP.</entry>
+        </row>
+        <row>
+          <entry>local-post-fo</entry>
+          <entry>after the <emphasis>fo</emphasis> target. FO is generated from Docbook source prior to generating pdf with Apache FOP.</entry>
+        </row>
+        <row>
+          <entry>local-pre-svg</entry>
+          <entry>before the <emphasis>svg</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>local-pre-cleanup-svg</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>svg</emphasis></entry>
+        </row>
+        <row>
+          <entry>local-post-svg</entry>
+          <entry>after the <emphasis>svg</emphasis> target</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+  <sect1>
+    <title>Feedback</title>
+    <para>
+    We&apos;d love to hear from you! Tell us about your experiences with &dobudish; and about the ways you use it and wish it extended.
+    For that purpose we&apos;ve set up 
+    a <ulink url="http://helpdesk.agynamix.de/index.php?pg=forums.topics&amp;id=1">discussion group on our website.</ulink>
+    Feel free to post your comments and suggestions! We&apos;ll do our best to help you have a great Docbook experience.
+    In case you really found a bug (just kidding, I&apos;m sure there are some hiding), 
+    please use our cool bug tracker to <ulink url="http://helpdesk.agynamix.de/index.php">report it to us</ulink>.
+  </para>
+    <para><?serna-redline-start 1000 Neu?>Neu<?serna-redline-end?></para>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="article-include.xml" encoding="UTF-8"/>
+  </sect1>
+</article>
