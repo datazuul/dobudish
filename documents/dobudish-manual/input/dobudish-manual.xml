@@ -87,6 +87,17 @@
         </author>
         <revremark>Description of new Website feature.</revremark>
       </revision>
+      <revision>
+        <revnumber>1.5</revnumber>
+        <date>01.08.2008</date>
+        <author>
+          <personname>
+            <firstname>Torsten</firstname>
+            <surname>Uhlmann</surname>
+          </personname>
+        </author>
+        <revremark>Added documentation for the defined Ant build script hooks.</revremark>
+      </revision>
     </revhistory>
     <abstract>
       <title>Overview</title>
@@ -614,16 +625,38 @@ generator.bat &lt;document-name&gt; distribute
     <title>Using Build Hooks to customize the document generation</title>
   </sect1>
   <para>
-    The build process is based on Apache Ant (a kind of <emphasis>make</emphasis> for Java). With Ant you have <emphasis>targets</emphasis>
-    which you call in order for Ant to perform several steps that would lead to the result of this target. <emphasis>PDF</emphasis> for instance,
-    is an Ant target. So when you call <computeroutput>generator.bat fluff pdf</computeroutput> it will internally call a target called <emphasis>pdf</emphasis>. 
+    The build process is based on Apache Ant (a kind of <emphasis>make</emphasis> for Java). 
+	With Ant you have <emphasis>targets</emphasis>
+    which you call in order for Ant to perform several steps that would lead to the result of this target. 
+	<emphasis>PDF</emphasis> for instance,
+    is an Ant target. So when you call <computeroutput>generator.bat fluff pdf</computeroutput> 
+	it will internally call a target called <emphasis>pdf</emphasis>. 
   </para>
   <para>
-    To give you some flexibility with the build process I have incorporated some hooks into the chain of executed commands. A hook is basically an Ant target.
-    If it&apos;s there it will be executed. If it is missing it&apos;s simply skipped. In your document&apos;s folder there is a folder called <emphasis>custom-cfg</emphasis>, 
-    within that you find a file <emphasis>localbuild.xml</emphasis> which is the place to add these hooks. Following is a table showing you all the available
-    hook targets together with a small explanation when they&apos;re called. If you&apos;re curious you can look into the build file 
-    <emphasis>system/etc/build-output-formats.xml</emphasis> where they&apos;re referenced.
+    To give you some flexibility with the build process I have incorporated some hooks into the chain of executed commands. 
+	A hook is basically an Ant target.
+    If it&apos;s there it will be executed. If it is missing it&apos;s simply skipped. 
+	In your document&apos;s folder there is a folder called <emphasis>custom-cfg</emphasis>, 
+    within that you find a file <emphasis>localbuild.xml</emphasis> which is the place to add local hooks.
+	Now if there are local hooks then there are also global ones (we want to be consistent, right?). Global hooks need to be
+	added to <emphasis>system/etc/build-user-augments.xml</emphasis>.
+  </para>
+  <para>
+    When hooks are executed the script will first search for a local hook. If the local hook is there it will be executed. If it can't be found
+	the systems looks for a defined global hook. Again if it&apos;s found it will be executed, otherwise the build process simply proceeds.
+	If you want to call global <emphasis role="bold">and</emphasis> local hooks for one specific hook you have to insert a call to the global hook
+	into the local one like so:
+	<computeroutput>&lt;antcall target="local-pre-init" /&gt;</computeroutput>
+  </para>
+  <para>
+	Following is a table showing you all the available
+    hook targets together with a small explanation when they&apos;re called. If you&apos;re 
+	curious you can look into the build file 
+    <emphasis>system/etc/build-output-formats.xml</emphasis> where almost all of them are referenced.
+  </para>
+  <para>
+    I will omit the prefix &quot;global&quot; or &quot;local&quot; except for those occasions where there is only one of the
+	two available.
   </para>
   <informaltable frame="all">
     <tgroup cols="2" colsep="1" rowsep="1" align="left">
@@ -641,232 +674,276 @@ generator.bat &lt;document-name&gt; distribute
       </thead>
       <tbody>
         <row>
-          <entry>local-pre-init</entry>
+          <entry>global-pre-create</entry>
+          <entry>before creation of a new document starts</entry>
+        </row>
+        <row>
+          <entry>-post-cp-custom</entry>
+          <entry>after copying the template's cfg directory into the documents directory</entry>
+        </row>
+        <row>
+          <entry>-post-cp-template</entry>
+          <entry>after copying relevant template files except the cfg directory and the template docbook files</entry>
+        </row>
+        <row>
+          <entry>-post-cp-example</entry>
+          <entry>after copying the template docbook files into the documents directory (not called for <emphasis>website</emphasis> documents)</entry>
+        </row>
+        <row>
+          <entry>-post-create</entry>
+          <entry>after the whole document creation process is done</entry>
+        </row>
+        <row>
+          <entry>-pre-init</entry>
           <entry>before initialization starts</entry>
         </row>
         <row>
-          <entry>local-post-init</entry>
+          <entry>-post-init</entry>
           <entry>after initialization finished</entry>
         </row>
         <row>
-          <entry>local-pre-resolve-xinclude</entry>
+          <entry>-pre-resolve-xinclude</entry>
           <entry>before the <emphasis>resolve-xinclude</emphasis> target. This target is called before the actual targets that generate things in order to slurp all document snippets together into one.</entry>
         </row>
         <row>
-          <entry>local-post-resolve-xinclude</entry>
+          <entry>-post-resolve-xinclude</entry>
           <entry>after the <emphasis>resolve-xinclude</emphasis> target. This target is called before the actual targets that generate things in order to slurp all document snippets together into one.</entry>
         </row>
         <row>
-          <entry>local-pre-singlehtml</entry>
+          <entry>-pre-singlehtml</entry>
           <entry>before the <emphasis>singlehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-singlehtml</entry>
+          <entry>-pre-cleanup-singlehtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>singlehtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-singlehtml</entry>
+          <entry>-post-singlehtml</entry>
           <entry>after the <emphasis>singlehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-singlexhtml</entry>
+          <entry>-pre-singlexhtml</entry>
           <entry>before the <emphasis>singlexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-singlexhtml</entry>
+          <entry>-pre-cleanup-singlexhtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>singlexhtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-singlexhtml</entry>
+          <entry>-post-singlexhtml</entry>
           <entry>after the <emphasis>singlexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-javahelp</entry>
+          <entry>-pre-javahelp</entry>
           <entry>before the <emphasis>javahelp</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-jar-javahelp</entry>
+          <entry>-pre-jar-javahelp</entry>
           <entry>before the <emphasis>jar</emphasis> target for <emphasis>javahelp</emphasis>. Called before the generated files ar packaged as JAR.</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-javahelp</entry>
+          <entry>-pre-cleanup-javahelp</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>javahelp</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-javahelp</entry>
+          <entry>-post-javahelp</entry>
           <entry>after the <emphasis>javahelp</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-eclipse</entry>
+          <entry>-pre-eclipse</entry>
           <entry>before the <emphasis>eclipse</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-jar-eclipse</entry>
+          <entry>-pre-jar-eclipse</entry>
           <entry>before the <emphasis>jar</emphasis> target for <emphasis>eclipse</emphasis>. Called before the generated files ar packaged as JAR.</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-eclipse</entry>
+          <entry>-pre-cleanup-eclipse</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>eclipse</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-eclipse</entry>
+          <entry>-post-eclipse</entry>
           <entry>after the <emphasis>eclipse</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-html</entry>
+          <entry>-pre-html</entry>
           <entry>before the <emphasis>html</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-html</entry>
+          <entry>-pre-cleanup-html</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>html</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-html</entry>
+          <entry>-post-html</entry>
           <entry>after the <emphasis>html</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-tablehtml</entry>
+          <entry>-pre-tablehtml</entry>
           <entry>before the <emphasis>tablehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-tablehtml</entry>
+          <entry>-pre-cleanup-tablehtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>tablehtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-tablehtml</entry>
+          <entry>-post-tablehtml</entry>
           <entry>after the <emphasis>tablehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-framehtml</entry>
+          <entry>-pre-framehtml</entry>
           <entry>before the <emphasis>framehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-framehtml</entry>
+          <entry>-pre-cleanup-framehtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>framehtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-framehtml</entry>
+          <entry>-post-framehtml</entry>
           <entry>after the <emphasis>framehtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-xhtml</entry>
+          <entry>-pre-xhtml</entry>
           <entry>before the <emphasis>xhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-xhtml</entry>
+          <entry>-pre-cleanup-xhtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>xhtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-xhtml</entry>
+          <entry>-post-xhtml</entry>
           <entry>after the <emphasis>xhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-tablexhtml</entry>
+          <entry>-pre-tablexhtml</entry>
           <entry>before the <emphasis>tablexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-tablexhtml</entry>
+          <entry>-pre-cleanup-tablexhtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>tablexhtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-tablexhtml</entry>
+          <entry>-post-tablexhtml</entry>
           <entry>after the <emphasis>tablexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-framexhtml</entry>
+          <entry>-pre-framexhtml</entry>
           <entry>before the <emphasis>framexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-framexhtml</entry>
+          <entry>-pre-cleanup-framexhtml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>framexhtml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-framexhtml</entry>
+          <entry>-post-framexhtml</entry>
           <entry>after the <emphasis>framexhtml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-htmlhelp</entry>
+          <entry>-pre-htmlhelp</entry>
           <entry>before the <emphasis>htmlhelp</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-hhc-htmlhelp</entry>
+          <entry>-pre-hhc-htmlhelp</entry>
           <entry>before the <emphasis>hhc</emphasis> target for <emphasis>htmlhelp</emphasis></entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-htmlhelp</entry>
+          <entry>-pre-cleanup-htmlhelp</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>htmlhelp</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-htmlhelp</entry>
+          <entry>-post-htmlhelp</entry>
           <entry>after the <emphasis>htmlhelp</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-pdf</entry>
+          <entry>-pre-pdf</entry>
           <entry>before the <emphasis>pdf</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-pdf</entry>
+          <entry>-pre-cleanup-pdf</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>pdf</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-pdf</entry>
+          <entry>-post-pdf</entry>
           <entry>after the <emphasis>pdf</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-rtf</entry>
+          <entry>-pre-rtf</entry>
           <entry>before the <emphasis>rtf</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-rtf</entry>
+          <entry>-pre-cleanup-rtf</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>rtf</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-rtf</entry>
+          <entry>-post-rtf</entry>
           <entry>after the <emphasis>rtf</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-wordml</entry>
+          <entry>-pre-wordml</entry>
           <entry>before the <emphasis>wordml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-wordml</entry>
+          <entry>-pre-cleanup-wordml</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>wordml</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-wordml</entry>
+          <entry>-post-wordml</entry>
           <entry>after the <emphasis>wordml</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-manpages</entry>
+          <entry>-pre-manpages</entry>
           <entry>before the <emphasis>manpages</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-manpages</entry>
+          <entry>-pre-cleanup-manpages</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>manpages</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-manpages</entry>
+          <entry>-post-manpages</entry>
           <entry>after the <emphasis>manpages</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-fo</entry>
+          <entry>-pre-fo</entry>
           <entry>before the <emphasis>fo</emphasis> target. FO is generated from Docbook source prior to generating pdf with Apache FOP.</entry>
         </row>
         <row>
-          <entry>local-post-fo</entry>
+          <entry>-post-fo</entry>
           <entry>after the <emphasis>fo</emphasis> target. FO is generated from Docbook source prior to generating pdf with Apache FOP.</entry>
         </row>
         <row>
-          <entry>local-pre-svg</entry>
+          <entry>-pre-svg</entry>
           <entry>before the <emphasis>svg</emphasis> target</entry>
         </row>
         <row>
-          <entry>local-pre-cleanup-svg</entry>
+          <entry>-pre-cleanup-svg</entry>
           <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>svg</emphasis></entry>
         </row>
         <row>
-          <entry>local-post-svg</entry>
+          <entry>-post-svg</entry>
           <entry>after the <emphasis>svg</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>-pre-ws-tab</entry>
+          <entry>before the <emphasis>ws-tab</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>-pre-cleanup-ws-tab</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>ws-tab</emphasis></entry>
+        </row>
+        <row>
+          <entry>-post-ws-tab</entry>
+          <entry>after the <emphasis>ws-tab</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>-pre-website</entry>
+          <entry>before the <emphasis>website</emphasis> target</entry>
+        </row>
+        <row>
+          <entry>-pre-cleanup-website</entry>
+          <entry>before the <emphasis>cleanup</emphasis> target for <emphasis>website</emphasis></entry>
+        </row>
+        <row>
+          <entry>-post-website</entry>
+          <entry>after the <emphasis>website</emphasis> target</entry>
         </row>
       </tbody>
     </tgroup>
@@ -881,7 +958,6 @@ generator.bat &lt;document-name&gt; distribute
     In case you really found a bug (just kidding, I&apos;m sure there are some hiding), 
     please use our cool bug tracker to <ulink url="http://helpdesk.agynamix.de/index.php">report it to us</ulink>.
   </para>
-    <para><?serna-redline-start 1000 Neu?>Neu<?serna-redline-end?></para>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="article-include.xml" encoding="UTF-8"/>
+    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="article-include.xml" encoding="UTF-8"/> -->
   </sect1>
 </article>

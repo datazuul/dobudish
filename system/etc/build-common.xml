@@ -51,13 +51,9 @@
   </xmlcatalog>
 
   <target name="init">
-    <trycatch>
-      <try>
-        <antcall target="local-pre-init" />
-      </try>
-      <catch>
-      </catch>
-    </trycatch>
+    <trycatch><try><antcall target="local-pre-init" /></try><catch>
+	  <trycatch><try><antcall target="global-pre-init" /></try><catch></catch></trycatch>
+	</catch></trycatch>
 
     <mkdir dir="${project.dir.output}/${project.output.mode}" />
     <delete includeemptydirs="true">
@@ -156,13 +152,9 @@
         </if>
       </else>
     </if>
-    <trycatch>
-      <try>
-        <antcall target="local-post-init" />
-      </try>
-      <catch>
-      </catch>
-    </trycatch>
+    <trycatch><try><antcall target="local-post-init" /></try><catch>
+	  <trycatch><try><antcall target="global-post-init" /></try><catch></catch></trycatch>
+	</catch></trycatch>
   </target>
 
   <target name="copy-resources">
@@ -328,25 +320,17 @@
   
   <!-- resolve-xinclude creates the .docbook file that conatains all the XInclude'd elements -->
   <target name="resolve-xinclude" depends="init">
-    <trycatch>
-      <try>
-        <antcall target="local-pre-resolve-xinclude" />
-      </try>
-      <catch>
-      </catch>
-    </trycatch>
+    <trycatch><try><antcall target="local-pre-resolve-xinclude" /></try><catch>
+	  <trycatch><try><antcall target="global-pre-resolve-xinclude" /></try><catch></catch></trycatch>
+	</catch></trycatch>
 
     <xslt-runner inputfile="${project.dir.input}/${project.input.file}.xml" outputfile="-o &quot;${project.dir.output}/${project.output.mode}/${project.input.file}.docbook&quot;" stylesheet="${system.custom-xsl.dir}/resolve-xinclude.xsl" />
 
     <antcall target="substitute-properties" />
 
-    <trycatch>
-      <try>
-        <antcall target="local-post-resolve-xinclude" />
-      </try>
-      <catch>
-      </catch>
-    </trycatch>
+    <trycatch><try><antcall target="local-post-resolve-xinclude" /></try><catch>
+	  <trycatch><try><antcall target="global-post-resolve-xinclude" /></try><catch></catch></trycatch>
+	</catch></trycatch>
   </target>
 
   <target name="substitute-properties">

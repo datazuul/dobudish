@@ -41,11 +41,13 @@
   <target name="create" description="Create a new [book, article, set, slides, website] document">
     <echo>Create a new project ${project.input.document}</echo>
     <mkdir dir="${project.dir}"/>
-    <trycatch><try><antcall target="local-pre-create" /></try><catch></catch></trycatch>
+    <trycatch><try><antcall target="global-pre-create" /></try><catch></catch></trycatch>
     <copy todir="${project.custom-cfg.dir}" failonerror="true">
       <fileset dir="${system.template.dir}/${ENV_PARAM_3}-tpl-dir/${ENV_PARAM_3}-cfg" />
     </copy>
-    <trycatch><try><antcall target="local-post-cp-custom" /></try><catch></catch></trycatch>
+    <trycatch><try><antcall target="local-post-cp-custom" /></try><catch>
+	  <trycatch><try><antcall target="global-post-cp-custom" /></try><catch></catch></trycatch>
+	</catch></trycatch>
   	<copy todir="${project.dir.input}" failonerror="false">
       <fileset dir="${system.template.dir}/${ENV_PARAM_3}-tpl-dir">
       	<exclude name="${ENV_PARAM_3}.xml" />
@@ -53,15 +55,21 @@
       	<exclude name="**/${ENV_PARAM_3}-cfg/**"/>
       </fileset>
     </copy>
-    <trycatch><try><antcall target="local-post-cp-template" /></try><catch></catch></trycatch>
+    <trycatch><try><antcall target="local-post-cp-template" /></try><catch>
+	  <trycatch><try><antcall target="global-post-cp-template" /></try><catch>
+	</catch></trycatch></catch></trycatch>    
 	<if><not><equals arg1="${ENV_PARAM_3}" arg2="website" /></not>
 	  <then>
         <copy tofile="${project.dir.input}/${project.input.document}.xml" file="${system.template.dir}/${ENV_PARAM_3}-tpl-dir/${ENV_PARAM_3}.xml" />
         <copy tofile="${project.dir.input}/${ENV_PARAM_3}-include.xml" file="${system.template.dir}/${ENV_PARAM_3}-tpl-dir/${ENV_PARAM_3}-include.xml" failonerror="false" />
-        <trycatch><try><antcall target="local-post-cp-example" /></try><catch></catch></trycatch>		
+        <trycatch><try><antcall target="local-post-cp-example" /></try><catch>
+		  <trycatch><try><antcall target="global-post-cp-example" /></try><catch></catch></trycatch>
+		</catch></trycatch>		
 	  </then>
 	</if>
-    <trycatch><try><antcall target="local-post-create" /></try><catch></catch></trycatch>
+    <trycatch><try><antcall target="local-post-create" /></try><catch>
+	  <trycatch><try><antcall target="global-post-create" /></try><catch></catch></trycatch>
+	</catch></trycatch>
   </target>
 
   <target name="clean" description="Clean up a document's output directory">

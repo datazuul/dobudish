@@ -76,6 +76,9 @@
   <!-- Import the local build file. Users can augment the build process here with local targets -->
   <import file="${project.custom-cfg.dir}/localbuild.xml" optional="true" />
 
+  <!-- A global file to define pre/post targets -->
+  <import file="build-user-augments.xml" optional="true" />
+
   <!-- Common definitions for the build process -->
   <import file="build-common.xml" optional="no" />
 

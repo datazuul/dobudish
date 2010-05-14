@@ -46,6 +46,37 @@
 <sect1><title>Release Notes</title>
   <para></para>
   <itemizedlist>
+    <listitem><para><emphasis role="bold" >Version 1.1.1</emphasis></para>
+	   <itemizedlist>
+		  <listitem><para>I expanded the manual to document the existing build hooks that are at your
+		  disposal.</para></listitem>
+		</itemizedlist>
+	</listitem>
+    <listitem><para><emphasis role="bold" >Version 1.1.0</emphasis></para>
+	   <itemizedlist>
+		  <listitem><para>I have added new global hooks into the Ant build scripts. Using the global
+		    hooks you can define actions for all documents in your document directory. A global hook
+			is executed only if no local hook of the same name exists. To call a global hook additionally
+			to the local one you have to explicitly call it from the local hook.
+		  </para><para>
+		    There is a new file called <emphasis>build-user-augments.xml</emphasis> which is supposed to hold
+			the global hooks you define.
+		  </para><para>
+		    Also there are new global hooks around the <emphasis>create</emphasis> target- a few of them
+			without local counterparts because there is not yet a localbuild.xml in existence.
+			Please see the manual for a (hopefully) complete list of build hooks.
+		  </para>
+		  </listitem>
+		</itemizedlist>
+	</listitem>
+    <listitem><para><emphasis role="bold" >Version 1.0.0</emphasis></para>
+	   <itemizedlist>
+		  <listitem><para>I renamed <emphasis role="bold">Dopus</emphasis> to 
+		    <emphasis role="bold">DobuDish</emphasis> due to a naming conflict 
+			with <ulink url="http://www.gpsoft.com.au/intro.html">Dopus</ulink>.
+		  </para></listitem>
+		</itemizedlist>
+	</listitem>
     <listitem><para><emphasis role="bold" >Version 0.9.16</emphasis></para>
 	   <itemizedlist>
 		  <listitem><para>Fixed bug with the new document.type mechanism. There was an oversight
@@ -63,7 +94,7 @@
 		  </para>
 		  </listitem>
 		</itemizedlist>
-	 </listitem>
+	</listitem>
     <listitem><para><emphasis role="bold" >Version 0.9.15</emphasis></para>
       <itemizedlist>
 			  <listitem><para>There is a new property in localbuild.properties which determines the type of the document.
