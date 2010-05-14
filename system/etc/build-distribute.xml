@@ -59,7 +59,7 @@
         <include name="**"/>
         <exclude name="*.sh"/>
       </zipfileset>
-      <zipfileset dir="${basedir}" prefix="dobudish-${version}" filemode="755">
+      <zipfileset dir="${basedir}" prefix="dobudish-${version}" filemode="755" excludes="${distribute.zip.excludes}">
         <include name="*.sh"/>
       </zipfileset>
     </zip> 
@@ -68,14 +68,14 @@
 
   <target name="distribute-dobudish-jre">
     <antcall target="distribute-dobudish-worker">
-      <param name="distribute.zip.excludes" value="**/documents/**,**/.svn,**/xfc/**,*.zip"/>
+      <param name="distribute.zip.excludes" value="**/documents/**,**/.svn/**,**/.hg/**,**/xfc/**,*.zip"/>
       <param name="distribute.zip.name"     value="dobudish-jre-${version}.zip"/>
     </antcall>
   </target>
 
   <target name="distribute-dobudish-nojre">
     <antcall target="distribute-dobudish-worker">
-      <param name="distribute.zip.excludes" value="**/documents/**,**/.svn,**/xfc/**,*.zip,**/jre/**"/>
+      <param name="distribute.zip.excludes" value="**/documents/**,**/.svn/**,**/.hg/**,**/xfc/**,*.zip,**/jre/**"/>
       <param name="distribute.zip.name"     value="dobudish-nojre-${version}.zip"/>
     </antcall>
   </target>
@@ -106,7 +106,7 @@
     <delete file="${document.archive.file}" failonerror="false"/>
     <zip destfile="${document.archive.file}" basedir="${project.dir}/.."
          includes="${project.input.document}/**" compress="true"
-         excludes="${project.input.document}/output/**,**/.svn,**/*.zip">
+         excludes="${project.input.document}/output/**,**/.svn/**,**/.hg/**,**/*.zip">
     </zip>
   </target>
   
