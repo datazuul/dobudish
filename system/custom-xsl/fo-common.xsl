@@ -32,7 +32,7 @@
     <xsl:param name="paper.type"      select="'A4'"/>
     <xsl:param name="draft.mode"      select="'no'"/>
 
-    <xsl:param name="fop.extensions"  select="1"/>
+    <xsl:param name="fop1.extensions"  select="1"/>
     <!--  <xsl:param name="xep.extensions"  select="1"/> -->
 
     <xsl:param name="title.font.family">Georgia</xsl:param>

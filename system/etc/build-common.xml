@@ -282,7 +282,7 @@
     <attribute name="outputfile" default="${project.dir.output}/${project.output.mode}/${project.input.file}.pdf" />
     <attribute name="maxmemory" default="${fop.maxmemory.default}" />
     <sequential>
-      <java fork="true" dir="@{dir}" failonerror="true" maxmemory="@{maxmemory}" classname="org.apache.fop.apps.Fop">
+      <java fork="true" dir="@{dir}" failonerror="true" maxmemory="@{maxmemory}" classname="org.apache.fop.cli.Main">
         <classpath>
           <fileset dir="${system.fop.dir}/build">
             <include name="**/*.jar" />
@@ -293,7 +293,7 @@
         </classpath>
         <jvmarg line="-Dhttp.proxyHost=${http.proxyHost}" />
         <jvmarg line="-Dhttp.proxyPort=${http.proxyPort}" />
-        <arg line="-c &quot;${system.fop.dir}/conf/userconfig.xml&quot;" />
+        <arg line="-c &quot;${system.fop.dir}/conf/fop.xconf&quot;" />
         <arg line="-fo &quot;@{inputfile}&quot;" />
         <arg line="-pdf &quot;@{outputfile}&quot;" />
       </java>
