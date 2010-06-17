@@ -3,12 +3,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: refentry.xsl 6434 2006-11-18 09:00:48Z bobstayton $
+     $Id: refentry.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -18,11 +18,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
     <xsl:if test="$generate.id.attributes != 0">
       <xsl:attribute name="id">
         <xsl:call-template name="object.id"/>
@@ -87,11 +85,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
     <xsl:if test="$refentry.separator != 0 and preceding-sibling::refentry">
       <div class="refentry.separator">
         <hr/>
@@ -133,8 +129,7 @@
 
 <xsl:template match="refnamediv">
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
     <xsl:call-template name="anchor"/>
@@ -196,22 +191,19 @@
 
 <xsl:template match="refclass">
   <xsl:if test="$refclass.suppress = 0">
-  <p>
-    <b>
-      <xsl:if test="@role">
-        <xsl:value-of select="@role"/>
-        <xsl:text>: </xsl:text>
-      </xsl:if>
-      <xsl:apply-templates/>
-    </b>
-  </p>
+  <b>
+    <xsl:if test="@role">
+      <xsl:value-of select="@role"/>
+      <xsl:text>: </xsl:text>
+    </xsl:if>
+    <xsl:apply-templates/>
+  </b>
   </xsl:if>
 </xsl:template>
 
 <xsl:template match="refsynopsisdiv">
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
     <xsl:call-template name="anchor"/>
@@ -243,19 +235,19 @@
 
 <xsl:template match="refsection|refsect1|refsect2|refsect3">
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
     <xsl:call-template name="anchor">
       <xsl:with-param name="conditional" select="0"/>
     </xsl:call-template>
-    <xsl:apply-templates/>
+    <!-- pick up info title -->
+    <xsl:apply-templates select="(title|info/title)[1]"/>
+    <xsl:apply-templates select="node()[not(self::title) and not(self::info)]"/>
   </div>
 </xsl:template>
 
-<xsl:template match="refsection/title">
+<xsl:template match="refsection/title|refsection/info/title">
   <!-- the ID is output in the block.object call for refsect1 -->
   <xsl:variable name="level" select="count(ancestor-or-self::refsection)"/>
   <xsl:variable name="refsynopsisdiv">
@@ -275,21 +267,21 @@
   </xsl:element>
 </xsl:template>
 
-<xsl:template match="refsect1/title">
+<xsl:template match="refsect1/title|refsect1/info/title">
   <!-- the ID is output in the block.object call for refsect1 -->
   <h2>
     <xsl:apply-templates/>
   </h2>
 </xsl:template>
 
-<xsl:template match="refsect2/title">
+<xsl:template match="refsect2/title|refsect2/info/title">
   <!-- the ID is output in the block.object call for refsect2 -->
   <h3>
     <xsl:apply-templates/>
   </h3>
 </xsl:template>
 
-<xsl:template match="refsect3/title">
+<xsl:template match="refsect3/title|refsect3/info/title">
   <!-- the ID is output in the block.object call for refsect3 -->
   <h4>
     <xsl:apply-templates/>

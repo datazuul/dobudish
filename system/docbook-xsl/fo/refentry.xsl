@@ -5,12 +5,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: refentry.xsl 6395 2006-11-11 08:46:43Z bobstayton $
+     $Id: refentry.xsl 7564 2007-11-19 18:38:43Z mzjn $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -532,7 +532,12 @@
                      |refsection/title
                      |refsect1/title
                      |refsect2/title
-                     |refsect3/title"
+                     |refsect3/title
+                     |refsynopsisdiv/info/title
+                     |refsection/info/title
+                     |refsect1/info/title
+                     |refsect2/info/title
+                     |refsect3/info/title"
               mode="titlepage.mode"
               priority="2">
   <xsl:call-template name="format.refentry.subheading"/>
@@ -557,7 +562,12 @@
 <!--       <xsl:with-param name="gentext.key" select="'RefName'"/> -->
 <!--     </xsl:call-template> -->
 <!-- -->
-  <xsl:param name="section" select="parent::*"/>
+  <xsl:param name="section" 
+             select="(ancestor::refsynopsisdiv 
+                     |ancestor::refsection
+                     |ancestor::refsect1
+                     |ancestor::refsect2
+                     |ancestor::refsect3)[last()]"/>
   <xsl:param name="offset" select="0"/>
   <xsl:param name="gentext.key"/>
 

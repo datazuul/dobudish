@@ -13,43 +13,31 @@
 <xsl:include href="../common/table.xsl"/>
 
 <!-- ********************************************************************
-     $Id: table.xsl 6474 2007-01-06 18:31:14Z bobstayton $
+     $Id: table.xsl 8392 2009-04-01 08:47:55Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
-<doc:reference xmlns="">
-<referenceinfo>
-<releaseinfo role="meta">
-$Id: table.xsl 6474 2007-01-06 18:31:14Z bobstayton $
-</releaseinfo>
-<author><surname>Walsh</surname>
-<firstname>Norman</firstname></author>
-<copyright><year>1999</year><year>2000</year>
-<holder>Norman Walsh</holder>
-</copyright>
-</referenceinfo>
-<title>Formatting Object Table Reference</title>
-
-<partintro id="partintro">
-<title>Introduction</title>
-
-<para>This is technical reference documentation for the DocBook XSL
-Stylesheets; it documents (some of) the parameters, templates, and
-other elements of the stylesheets.</para>
-
-<para>This is not intended to be <quote>user</quote> documentation.
-It is provided for developers writing customization layers for the
-stylesheets, and for anyone who's interested in <quote>how it
-works</quote>.</para>
-
-<para>Although I am trying to be thorough, this documentation is known
-to be incomplete. Don't forget to read the source, too :-)</para>
-</partintro>
+<doc:reference xmlns="" xml:id="table-templates">
+  <?dbhtml dir="fo"?>
+  <info>
+    <title>Formatting Object Table Reference</title>
+    <releaseinfo role="meta">
+      $Id: table.xsl 8392 2009-04-01 08:47:55Z bobstayton $
+    </releaseinfo>
+  </info>
+  <partintro xml:id="partintro">
+    <title>Introduction</title>
+    <para>This is technical reference documentation for the FO
+      table-processing templates in the DocBook XSL Stylesheets.</para>
+    <para>This is not intended to be user documentation.  It is
+      provided for developers writing customization layers for the
+      stylesheets.</para>
+  </partintro>
 </doc:reference>
 
 <!-- ==================================================================== -->
@@ -75,11 +63,7 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 <xsl:template name="calsTable">
 
   <xsl:variable name="keep.together">
-    <xsl:call-template name="dbfo-attribute">
-      <xsl:with-param name="pis"
-                      select="processing-instruction('dbfo')"/>
-      <xsl:with-param name="attribute" select="'keep-together'"/>
-    </xsl:call-template>
+    <xsl:call-template name="pi.dbfo_keep-together"/>
   </xsl:variable>
 
   <xsl:for-each select="tgroup">
@@ -113,6 +97,11 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:if>
       <xsl:apply-templates select="."/>
     </fo:table>
+
+    <xsl:for-each select="mediaobject|graphic">
+      <xsl:apply-templates select="."/>
+    </xsl:for-each>
+
   </xsl:for-each>
 </xsl:template>
 
@@ -151,10 +140,19 @@ to be incomplete. Don't forget to read the source, too :-)</para>
     </xsl:choose>
   </xsl:variable>
 
+  <xsl:variable name="keep.together">
+    <xsl:call-template name="pi.dbfo_keep-together"/>
+  </xsl:variable>
+
   <xsl:choose>
     <xsl:when test="self::table">
       <fo:block id="{$id}"
                 xsl:use-attribute-sets="table.properties">
+        <xsl:if test="$keep.together != ''">
+          <xsl:attribute name="keep-together.within-column">
+            <xsl:value-of select="$keep.together"/>
+          </xsl:attribute>
+        </xsl:if>
         <xsl:if test="$placement = 'before'">
           <xsl:call-template name="formal.object.heading">
             <xsl:with-param name="placement" select="$placement"/>
@@ -210,7 +208,7 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </fo:block-container>
     </xsl:when>
     <xsl:when test="@pgwide = 1">
-      <fo:block span="all" start-indent="0pt" end-indent="0pt">
+      <fo:block xsl:use-attribute-sets="pgwide.properties">
         <xsl:copy-of select="$table.block"/>
       </fo:block>
     </xsl:when>
@@ -227,10 +225,12 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 
   <xsl:variable name="rowsep">
     <xsl:choose>
-      <!-- If this is the last row, rowsep never applies. -->
+      <!-- If this is the last row, rowsep never applies (except when 
+           the ancestor tgroup has a following sibling tgroup) -->
       <xsl:when test="not(ancestor-or-self::row[1]/following-sibling::row
                           or ancestor-or-self::thead/following-sibling::tbody
-                          or ancestor-or-self::tbody/preceding-sibling::tfoot)">
+                          or ancestor-or-self::tbody/preceding-sibling::tfoot)
+                          and not(ancestor::tgroup/following-sibling::tgroup)">
         <xsl:value-of select="0"/>
       </xsl:when>
       <xsl:otherwise>
@@ -274,7 +274,7 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 
     <xsl:if test="$colsep &gt; 0 and number($colnum) &lt; ancestor::tgroup/@cols">
       <xsl:call-template name="border">
-        <xsl:with-param name="side" select="'right'"/>
+        <xsl:with-param name="side" select="'end'"/>
       </xsl:call-template>
     </xsl:if>
 
@@ -285,21 +285,25 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 
 <!-- ==================================================================== -->
 <xsl:template name="table.frame">
-  <xsl:variable name="frame">
+  <xsl:param name="frame">
     <xsl:choose>
       <xsl:when test="../@frame">
         <xsl:value-of select="../@frame"/>
       </xsl:when>
+      <xsl:when test="$default.table.frame != ''">
+        <xsl:value-of select="$default.table.frame"/>
+      </xsl:when>
       <xsl:otherwise>all</xsl:otherwise>
     </xsl:choose>
-  </xsl:variable>
+  </xsl:param>
+
 
   <xsl:choose>
     <xsl:when test="$frame='all'">
-      <xsl:attribute name="border-left-style">
+      <xsl:attribute name="border-start-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-style">
+      <xsl:attribute name="border-end-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
       <xsl:attribute name="border-top-style">
@@ -308,10 +312,10 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       <xsl:attribute name="border-bottom-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
-      <xsl:attribute name="border-left-width">
+      <xsl:attribute name="border-start-width">
         <xsl:value-of select="$table.frame.border.thickness"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-width">
+      <xsl:attribute name="border-end-width">
         <xsl:value-of select="$table.frame.border.thickness"/>
       </xsl:attribute>
       <xsl:attribute name="border-top-width">
@@ -320,10 +324,10 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       <xsl:attribute name="border-bottom-width">
         <xsl:value-of select="$table.frame.border.thickness"/>
       </xsl:attribute>
-      <xsl:attribute name="border-left-color">
+      <xsl:attribute name="border-start-color">
         <xsl:value-of select="$table.frame.border.color"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-color">
+      <xsl:attribute name="border-end-color">
         <xsl:value-of select="$table.frame.border.color"/>
       </xsl:attribute>
       <xsl:attribute name="border-top-color">
@@ -334,8 +338,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:attribute>
     </xsl:when>
     <xsl:when test="$frame='bottom'">
-      <xsl:attribute name="border-left-style">none</xsl:attribute>
-      <xsl:attribute name="border-right-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
       <xsl:attribute name="border-top-style">none</xsl:attribute>
       <xsl:attribute name="border-bottom-style">
         <xsl:value-of select="$table.frame.border.style"/>
@@ -348,30 +352,58 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:attribute>
     </xsl:when>
     <xsl:when test="$frame='sides'">
-      <xsl:attribute name="border-left-style">
+      <xsl:attribute name="border-start-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-style">
+      <xsl:attribute name="border-end-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
       <xsl:attribute name="border-top-style">none</xsl:attribute>
       <xsl:attribute name="border-bottom-style">none</xsl:attribute>
-      <xsl:attribute name="border-left-width">
+      <xsl:attribute name="border-start-width">
         <xsl:value-of select="$table.frame.border.thickness"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-width">
+      <xsl:attribute name="border-end-width">
         <xsl:value-of select="$table.frame.border.thickness"/>
       </xsl:attribute>
-      <xsl:attribute name="border-left-color">
+      <xsl:attribute name="border-start-color">
         <xsl:value-of select="$table.frame.border.color"/>
       </xsl:attribute>
-      <xsl:attribute name="border-right-color">
+      <xsl:attribute name="border-end-color">
+        <xsl:value-of select="$table.frame.border.color"/>
+      </xsl:attribute>
+    </xsl:when>
+    <xsl:when test="$frame='lhs'">
+      <xsl:attribute name="border-start-style">
+        <xsl:value-of select="$table.frame.border.style"/>
+      </xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
+      <xsl:attribute name="border-top-style">none</xsl:attribute>
+      <xsl:attribute name="border-bottom-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-width">
+        <xsl:value-of select="$table.frame.border.thickness"/>
+      </xsl:attribute>
+      <xsl:attribute name="border-start-color">
+        <xsl:value-of select="$table.frame.border.color"/>
+      </xsl:attribute>
+    </xsl:when>
+    <xsl:when test="$frame='rhs'">
+      <xsl:attribute name="border-end-style">
+        <xsl:value-of select="$table.frame.border.style"/>
+      </xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
+      <xsl:attribute name="border-top-style">none</xsl:attribute>
+      <xsl:attribute name="border-bottom-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-width">
+        <xsl:value-of select="$table.frame.border.thickness"/>
+      </xsl:attribute>
+      <xsl:attribute name="border-end-color">
         <xsl:value-of select="$table.frame.border.color"/>
       </xsl:attribute>
     </xsl:when>
     <xsl:when test="$frame='top'">
-      <xsl:attribute name="border-left-style">none</xsl:attribute>
-      <xsl:attribute name="border-right-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
       <xsl:attribute name="border-top-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
@@ -384,8 +416,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:attribute>
     </xsl:when>
     <xsl:when test="$frame='topbot'">
-      <xsl:attribute name="border-left-style">none</xsl:attribute>
-      <xsl:attribute name="border-right-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
       <xsl:attribute name="border-top-style">
         <xsl:value-of select="$table.frame.border.style"/>
       </xsl:attribute>
@@ -406,8 +438,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:attribute>
     </xsl:when>
     <xsl:when test="$frame='none'">
-      <xsl:attribute name="border-left-style">none</xsl:attribute>
-      <xsl:attribute name="border-right-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
       <xsl:attribute name="border-top-style">none</xsl:attribute>
       <xsl:attribute name="border-bottom-style">none</xsl:attribute>
     </xsl:when>
@@ -416,8 +448,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
         <xsl:text>Impossible frame on table: </xsl:text>
         <xsl:value-of select="$frame"/>
       </xsl:message>
-      <xsl:attribute name="border-left-style">none</xsl:attribute>
-      <xsl:attribute name="border-right-style">none</xsl:attribute>
+      <xsl:attribute name="border-start-style">none</xsl:attribute>
+      <xsl:attribute name="border-end-style">none</xsl:attribute>
       <xsl:attribute name="border-top-style">none</xsl:attribute>
       <xsl:attribute name="border-bottom-style">none</xsl:attribute>
     </xsl:otherwise>
@@ -427,7 +459,7 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 <!-- ==================================================================== -->
 
 <xsl:template name="border">
-  <xsl:param name="side" select="'left'"/>
+  <xsl:param name="side" select="'start'"/>
 
   <xsl:attribute name="border-{$side}-width">
     <xsl:value-of select="$table.cell.border.thickness"/>
@@ -477,16 +509,11 @@ to be incomplete. Don't forget to read the source, too :-)</para>
                 $passivetex.extensions != 0">
     <xsl:attribute name="table-layout">fixed</xsl:attribute>
   </xsl:if>
-
-  <xsl:if test="count(preceding-sibling::tgroup) = 0">
-    <!-- If this is the first tgroup, output the width attribute for the -->
-    <!-- surrounding fo:table. (If this isn't the first tgroup, trying   -->
-    <!-- to output the attribute will cause an error.)                   -->
+ 
     <xsl:attribute name="width">
       <xsl:value-of select="$table.width"/>
     </xsl:attribute>
-  </xsl:if>
-
+ 
   <xsl:choose>
     <xsl:when test="$use.extensions != 0
                     and $tablecolumns.extension != 0">
@@ -530,24 +557,20 @@ to be incomplete. Don't forget to read the source, too :-)</para>
   <xsl:variable name="explicit.table.width">
     <xsl:choose>
       <xsl:when test="self::entrytbl">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis" 
-                          select="processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'table-width'"/>
-        </xsl:call-template>
+        <xsl:call-template name="pi.dbfo_table-width"/>
       </xsl:when>
       <xsl:when test="self::table or self::informaltable">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis" 
-                          select="processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'table-width'"/>
-        </xsl:call-template>
+        <xsl:call-template name="pi.dbfo_table-width"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis" 
-                          select="../processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'table-width'"/>
+        <!-- * no dbfo@table-width PI as a child of this table, so check -->
+        <!-- * the parent of this table to see if the table has any -->
+        <!-- * sibling dbfo@table-width PIs (FIXME: 2007-07 MikeSmith: we -->
+        <!-- * should really instead be checking here just to see if the -->
+        <!-- * first preceding sibling of this table is a -->
+        <!-- * dbfo@table-width PI) -->
+        <xsl:call-template name="pi.dbfo_table-width">
+          <xsl:with-param name="node" select=".."/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -556,21 +579,24 @@ to be incomplete. Don't forget to read the source, too :-)</para>
   <xsl:variable name="column.sum">
     <xsl:choose>
       <!-- CALS table -->
-      <xsl:when test="tgroup[1][@cols]">
-        <xsl:if test="count(tgroup[1]/colspec) = tgroup/@cols">
-          <xsl:for-each select="tgroup[1]/colspec">
-            <xsl:if test="position() != 1">
-              <xsl:text> + </xsl:text>
-            </xsl:if>
-            <xsl:choose>
-              <xsl:when test="not(@colwidth)">NOWIDTH</xsl:when>
-              <xsl:when test="contains(@colwidth, '*')">NOWIDTH</xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@colwidth"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:if>
+      <xsl:when test="tgroup/@cols">
+        <!-- change context to the first tgroup -->
+        <xsl:for-each select="tgroup[1]">
+          <xsl:if test="count(colspec) = @cols">
+            <xsl:for-each select="colspec">
+              <xsl:if test="position() != 1">
+                <xsl:text> + </xsl:text>
+              </xsl:if>
+              <xsl:choose>
+                <xsl:when test="not(@colwidth)">NOWIDTH</xsl:when>
+                <xsl:when test="contains(@colwidth, '*')">NOWIDTH</xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@colwidth"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
         <!-- HTML table -->
@@ -748,16 +774,32 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 
 <!-- customize this template to add row properties -->
 <xsl:template name="table.row.properties">
-  <xsl:variable name="bgcolor">
-    <xsl:call-template name="dbfo-attribute">
-      <xsl:with-param name="pis" select="processing-instruction('dbfo')"/>
-      <xsl:with-param name="attribute" select="'bgcolor'"/>
-    </xsl:call-template>
+
+  <xsl:variable name="row-height">
+    <xsl:if test="processing-instruction('dbfo')">
+      <xsl:call-template name="pi.dbfo_row-height"/>
+    </xsl:if>
   </xsl:variable>
+
+  <xsl:if test="$row-height != ''">
+    <xsl:attribute name="block-progression-dimension">
+      <xsl:value-of select="$row-height"/>
+    </xsl:attribute>
+  </xsl:if>
+
+  <xsl:variable name="bgcolor">
+    <xsl:call-template name="pi.dbfo_bgcolor"/>
+  </xsl:variable>
+
   <xsl:if test="$bgcolor != ''">
     <xsl:attribute name="background-color">
       <xsl:value-of select="$bgcolor"/>
     </xsl:attribute>
+  </xsl:if>
+
+  <!-- Keep header row with next row -->
+  <xsl:if test="ancestor::thead">
+    <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
   </xsl:if>
 
 </xsl:template>
@@ -805,12 +847,23 @@ to be incomplete. Don't forget to read the source, too :-)</para>
 
   <xsl:variable name="rowsep">
     <xsl:choose>
-      <!-- If this is the last row, rowsep never applies. -->
+      <!-- If this is the last row, rowsep never applies (except when 
+           the ancestor tgroup has a following sibling tgroup) -->
       <xsl:when test="not(ancestor-or-self::row[1]/following-sibling::row
                           or ancestor-or-self::thead/following-sibling::tbody
-                          or ancestor-or-self::tbody/preceding-sibling::tfoot)">
+                          or ancestor-or-self::tbody/preceding-sibling::tfoot)
+                          and not(ancestor::tgroup/following-sibling::tgroup)">
         <xsl:value-of select="0"/>
       </xsl:when>
+      <!-- Check for morerows too -->
+      <xsl:when test="(@morerows and count(ancestor-or-self::row[1]/
+                       following-sibling::row) = @morerows )
+                      and not (ancestor-or-self::thead/following-sibling::tbody
+                       or ancestor-or-self::tbody/preceding-sibling::tfoot)
+                       and not(ancestor::tgroup/following-sibling::tgroup)">
+        <xsl:value-of select="0"/>
+      </xsl:when>
+
       <xsl:otherwise>
         <xsl:call-template name="inherited.table.attribute">
           <xsl:with-param name="entry" select="."/>
@@ -936,34 +989,26 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:variable>
 
       <xsl:variable name="cell-orientation">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis"
-                          select="ancestor-or-self::entry/processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'orientation'"/>
+        <xsl:call-template name="pi.dbfo_orientation">
+          <xsl:with-param name="node" select="ancestor-or-self::entry"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="row-orientation">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis"
-                          select="ancestor-or-self::row/processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'orientation'"/>
+        <xsl:call-template name="pi.dbfo_orientation">
+          <xsl:with-param name="node" select="ancestor-or-self::row"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="cell-width">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis"
-                          select="ancestor-or-self::entry/processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'rotated-width'"/>
+        <xsl:call-template name="pi.dbfo_rotated-width">
+          <xsl:with-param name="node" select="ancestor-or-self::entry"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="row-width">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis"
-                          select="ancestor-or-self::row/processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'rotated-width'"/>
+        <xsl:call-template name="pi.dbfo_rotated-width">
+          <xsl:with-param name="node" select="ancestor-or-self::row"/>
         </xsl:call-template>
       </xsl:variable>
 
@@ -990,10 +1035,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:variable>
 
       <xsl:variable name="bgcolor">
-        <xsl:call-template name="dbfo-attribute">
-          <xsl:with-param name="pis"
-                          select="ancestor-or-self::entry/processing-instruction('dbfo')"/>
-          <xsl:with-param name="attribute" select="'bgcolor'"/>
+        <xsl:call-template name="pi.dbfo_bgcolor">
+          <xsl:with-param name="node" select="ancestor-or-self::entry"/>
         </xsl:call-template>
       </xsl:variable>
 
@@ -1092,9 +1135,9 @@ to be incomplete. Don't forget to read the source, too :-)</para>
       </xsl:if>
 
       <xsl:if test="$colsep.inherit &gt; 0 and 
-                      $col &lt; ancestor::tgroup/@cols">
+                      $col &lt; (ancestor::tgroup/@cols|ancestor::entrytbl/@cols)[last()]">
         <xsl:call-template name="border">
-          <xsl:with-param name="side" select="'right'"/>
+          <xsl:with-param name="side" select="'end'"/>
         </xsl:call-template>
       </xsl:if>
 
@@ -1132,18 +1175,38 @@ to be incomplete. Don't forget to read the source, too :-)</para>
     </xsl:when>
     <xsl:otherwise>
       <!-- HTML table -->
-      <xsl:variable name="border" 
-                    select="(ancestor::table |
-                             ancestor::informaltable)[last()]/@border"/>
-      <xsl:if test="$border != '' and $border != 0">
-        <xsl:attribute name="border">
-          <xsl:value-of select="$table.cell.border.thickness"/>
-          <xsl:text> </xsl:text>
-          <xsl:value-of select="$table.cell.border.style"/>
-          <xsl:text> </xsl:text>
-          <xsl:value-of select="$table.cell.border.color"/>
+      <xsl:if test="$bgcolor.pi != ''">
+        <xsl:attribute name="background-color">
+          <xsl:value-of select="$bgcolor.pi"/>
         </xsl:attribute>
       </xsl:if>
+
+      <xsl:if test="$align.inherit != ''">
+        <xsl:attribute name="text-align">
+          <xsl:value-of select="$align.inherit"/>
+        </xsl:attribute>
+      </xsl:if>
+
+      <xsl:if test="$valign.inherit != ''">
+        <xsl:attribute name="display-align">
+          <xsl:choose>
+            <xsl:when test="$valign.inherit='top'">before</xsl:when>
+            <xsl:when test="$valign.inherit='middle'">center</xsl:when>
+            <xsl:when test="$valign.inherit='bottom'">after</xsl:when>
+            <xsl:otherwise>
+              <xsl:message>
+                <xsl:text>Unexpected valign value: </xsl:text>
+                <xsl:value-of select="$valign.inherit"/>
+                <xsl:text>, center used.</xsl:text>
+              </xsl:message>
+              <xsl:text>center</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+
+      <xsl:call-template name="html.table.cell.rules"/>
+
     </xsl:otherwise>
   </xsl:choose>
 
@@ -1194,8 +1257,8 @@ to be incomplete. Don't forget to read the source, too :-)</para>
     <xsl:when test="number($entry.colnum) &gt; $col">
       <xsl:text>0:</xsl:text>
       <xsl:call-template name="sentry">
-        <xsl:with-param name="col" select="$col+$entry.colspan"/>
-        <xsl:with-param name="spans" select="$following.spans"/>
+        <xsl:with-param name="col" select="$col + 1"/>
+        <xsl:with-param name="spans" select="substring-after($spans,':')"/>
       </xsl:call-template>
     </xsl:when>
 

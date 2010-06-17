@@ -4,7 +4,7 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: inline.xsl 6496 2007-01-15 01:47:19Z xmldoc $
+     $Id: inline.xsl 7897 2008-03-10 15:46:03Z xmldoc $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
@@ -15,18 +15,24 @@
 
 <!-- ==================================================================== -->
 
-<xsl:template match="replaceable|varname">
+<xsl:template match="replaceable|varname|structfield">
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="italic" select="."/>
+  <xsl:call-template name="italic">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="option|userinput|envar|errorcode|constant|markup">
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="bold" select="."/>
+  <xsl:call-template name="bold">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="classname">
@@ -40,7 +46,10 @@
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="bold" select="."/>
+  <xsl:call-template name="bold">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="type[not(ancestor::cmdsynopsis) and
@@ -48,7 +57,10 @@
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="bold" select="."/>
+  <xsl:call-template name="bold">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="function[not(ancestor::cmdsynopsis) and
@@ -56,7 +68,10 @@
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="bold" select="."/>
+  <xsl:call-template name="bold">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="parameter[not(ancestor::cmdsynopsis) and
@@ -64,7 +79,10 @@
   <xsl:if test="$man.hyphenate.computer.inlines = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="italic" select="."/>
+  <xsl:call-template name="italic">
+    <xsl:with-param name="node" select="."/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
 </xsl:template>
 
 <xsl:template match="filename">
@@ -74,18 +92,30 @@
                 $man.break.after.slash = 0">
     <xsl:call-template name="suppress.hyphenation"/>
   </xsl:if>
-  <xsl:apply-templates mode="italic" select="."/>
+  <!-- * part of the old man(7) man page, now man-pages(7), says, -->
+  <!-- * "Filenames (whether pathnames, or references to files in the -->
+  <!-- * /usr/include directory) are always in italics". But that's dumb, -->
+  <!-- * and looks like crap in PS/printed/PDF output, and there's no -->
+  <!-- * sound rationale for it, so we don't do it. -->
+  <xsl:call-template name="inline.monoseq"/>
 </xsl:template>
 
 <xsl:template match="emphasis">
   <xsl:choose>
-    <xsl:when test="@role = 'bold' or
-                    @role = 'strong' or
-                    @remap = 'B'">
-      <xsl:apply-templates mode="bold" select="."/>
+    <xsl:when test="
+      @role = 'bold' or
+      @role = 'strong' or
+      @remap = 'B'">
+      <xsl:call-template name="bold">
+        <xsl:with-param name="node" select="."/>
+        <xsl:with-param name="context" select="."/>
+      </xsl:call-template>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:apply-templates mode="italic" select="."/>
+      <xsl:call-template name="italic">
+        <xsl:with-param name="node" select="."/>
+        <xsl:with-param name="context" select="."/>
+      </xsl:call-template>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -100,9 +130,12 @@
   <xsl:param name="refentrytitle" select="''"/>
   <xsl:param name="manvolnum" select="''"/>
   <xsl:variable name="title">
-    <bold><xsl:value-of select="$refentrytitle"/></bold>
+    <xsl:value-of select="$refentrytitle"/>
   </xsl:variable>
-  <xsl:apply-templates mode="bold" select="exsl:node-set($title)"/>
+  <xsl:call-template name="bold">
+    <xsl:with-param name="node" select="exsl:node-set($title)"/>
+    <xsl:with-param name="context" select="."/>
+  </xsl:call-template>
   <xsl:text>(</xsl:text>
   <xsl:value-of select="$manvolnum"/>
   <xsl:text>)</xsl:text>
@@ -146,10 +179,41 @@
   </xsl:choose>
 </xsl:template>
 
-<!-- * span in seems to sneak through into output sometimes, possibly due -->
+<!-- * span seems to sneak through into output sometimes, possibly due -->
 <!-- * to failed Olink processing; so we need to catch it -->
 <xsl:template match="span">
   <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="inlinemediaobject">
+  <xsl:apply-templates/>
+</xsl:template>
+
+<!-- * indexterm instances produce groff comments like this: -->
+<!-- * .\" primary: secondary: tertiary -->
+<xsl:template match="indexterm">
+  <xsl:text>.\" </xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="primary">
+  <xsl:value-of select="normalize-space(.)"/>
+</xsl:template>
+
+<xsl:template match="secondary|tertiary">
+  <xsl:text>: </xsl:text>
+  <xsl:value-of select="normalize-space(.)"/>
+</xsl:template>
+
+<!-- * non-empty remark instances produce groff comments -->
+<xsl:template match="remark">
+  <xsl:variable name="content" select="normalize-space(.)"/>
+  <xsl:if test="not($content = '')">
+    <xsl:text>.\" </xsl:text>
+    <xsl:value-of select="$content"/>
+    <xsl:text>&#10;</xsl:text>
+  </xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>

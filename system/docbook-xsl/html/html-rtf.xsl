@@ -6,12 +6,12 @@
                 version="1.0">
 
 <!-- ********************************************************************
-     $Id: html-rtf.xsl 6403 2006-11-12 08:23:54Z bobstayton $
+     $Id: html-rtf.xsl 8345 2009-03-16 06:44:07Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -108,7 +108,7 @@
 <xsl:template name="unwrap.p">
   <xsl:param name="p"/>
   <xsl:choose>
-    <xsl:when test="function-available('exsl:node-set')
+    <xsl:when test="$exsl.node.set.available != 0
                     and function-available('set:leading')
                     and function-available('set:trailing')">
       <xsl:apply-templates select="exsl:node-set($p)" mode="unwrap.p"/>
@@ -301,7 +301,7 @@
 <xsl:template name="remove.empty.div">
   <xsl:param name="div"/>
   <xsl:choose>
-    <xsl:when test="function-available('exsl:node-set')">
+    <xsl:when test="$exsl.node.set.available != 0">
       <xsl:apply-templates select="exsl:node-set($div)" mode="remove.empty.div"/>
     </xsl:when>
     <xsl:otherwise>

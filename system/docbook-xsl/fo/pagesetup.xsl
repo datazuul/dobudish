@@ -4,12 +4,12 @@
                 version="1.0">
 
 <!-- ********************************************************************
-     $Id: pagesetup.xsl 6483 2007-01-08 18:00:22Z bobstayton $
+     $Id: pagesetup.xsl 8320 2009-03-12 17:43:44Z mzjn $
      ********************************************************************
 
      This file is part of the DocBook XSL Stylesheet distribution.
      See ../README or http://docbook.sf.net/ for copyright
-     and other information.
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -27,23 +27,6 @@
   <xsl:if test="$title.font.family != ''
                 and $symbol.font.family  != ''">,</xsl:if>
     <xsl:value-of select="$symbol.font.family"/>
-</xsl:param>
-
-<!-- PassiveTeX can't handle the math expression for
-     title.margin.left being negative, so ignore it.
-     margin-left="{$page.margin.outer} - {$title.margin.left}"
--->
-<xsl:param name="margin.left.outer">
-  <xsl:choose>
-    <xsl:when test="$passivetex.extensions != 0">
-      <xsl:value-of select="$page.margin.outer"/>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:value-of select="$page.margin.outer"/>
-      <xsl:text> - </xsl:text>
-      <xsl:value-of select="$title.margin.left"/>
-    </xsl:otherwise>
-  </xsl:choose>
 </xsl:param>
 
 <xsl:param name="margin.left.inner">
@@ -66,9 +49,16 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
           <xsl:with-param name="page.master">blank</xsl:with-param>
@@ -94,12 +84,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">titlepage-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -119,12 +116,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">titlepage-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -144,12 +148,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">titlepage-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -170,12 +181,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">lot-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -195,12 +213,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">lot-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -220,12 +245,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">lot-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -246,12 +278,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">front-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -271,12 +310,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">front-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -296,12 +342,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">front-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -322,12 +375,22 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">body-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -347,12 +410,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">body-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -372,12 +442,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">body-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -398,12 +475,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">back-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -423,12 +507,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">back-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -448,12 +539,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$margin.left.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">back-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -474,12 +572,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$page.margin.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">index-first</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -499,12 +604,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$page.margin.inner}"
-                           margin-right="{$page.margin.outer}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.inner"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.outer"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">index-odd</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -524,12 +636,19 @@
                            page-width="{$page.width}"
                            page-height="{$page.height}"
                            margin-top="{$page.margin.top}"
-                           margin-bottom="{$page.margin.bottom}"
-                           margin-left="{$page.margin.outer}"
-                           margin-right="{$page.margin.inner}">
+                           margin-bottom="{$page.margin.bottom}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:value-of select="$page.margin.outer"/>
+	<xsl:if test="$fop.extensions != 0">
+	  <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="margin-{$direction.align.end}">
+        <xsl:value-of select="$page.margin.inner"/>
+      </xsl:attribute>
       <xsl:if test="$axf.extensions != 0">
         <xsl:call-template name="axf-page-master-properties">
-          <xsl:with-param name="page.master">blank</xsl:with-param>
+          <xsl:with-param name="page.master">index-even</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
       <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -551,12 +670,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">blank-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -586,12 +712,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">titlepage-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -622,12 +755,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">titlepage-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -658,12 +798,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">titlepage-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -695,12 +842,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">lot-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -731,12 +885,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">lot-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -767,12 +928,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">lot-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -804,12 +972,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">front-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -840,12 +1015,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">front-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -876,12 +1058,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">front-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -913,12 +1102,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">body-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -949,12 +1145,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">body-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -985,12 +1188,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">body-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1022,12 +1232,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">back-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1058,12 +1275,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">back-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1094,12 +1318,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$margin.left.outer}"
-                             margin-right="{$page.margin.inner}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">back-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1131,12 +1362,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$page.margin.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">index-first-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1167,12 +1405,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-left="{$page.margin.inner}"
-                             margin-right="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.inner"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.outer"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">index-odd-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1203,12 +1448,19 @@
                              page-width="{$page.width}"
                              page-height="{$page.height}"
                              margin-top="{$page.margin.top}"
-                             margin-bottom="{$page.margin.bottom}"
-                             margin-right="{$page.margin.inner}"
-                             margin-left="{$page.margin.outer}">
+                             margin-bottom="{$page.margin.bottom}">
+        <xsl:attribute name="margin-{$direction.align.start}">
+          <xsl:value-of select="$page.margin.outer"/>
+	  <xsl:if test="$fop.extensions != 0">
+	    <xsl:value-of select="concat(' - (',$title.margin.left,')')"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="margin-{$direction.align.end}">
+          <xsl:value-of select="$page.margin.inner"/>
+        </xsl:attribute>
         <xsl:if test="$axf.extensions != 0">
           <xsl:call-template name="axf-page-master-properties">
-            <xsl:with-param name="page.master">blank</xsl:with-param>
+            <xsl:with-param name="page.master">index-even-draft</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
         <fo:region-body margin-bottom="{$body.margin.bottom}"
@@ -1512,6 +1764,7 @@
       </xsl:when>
       <xsl:when test="$pageclass = 'lot'">lot</xsl:when>
       <xsl:when test="$element = 'dedication'">front</xsl:when>
+      <xsl:when test="$element = 'acknowledgements'">front</xsl:when>
       <xsl:when test="$element = 'preface'">front</xsl:when>
       <xsl:when test="$element = 'appendix'">back</xsl:when>
       <xsl:when test="$element = 'glossary'">back</xsl:when>
@@ -1669,7 +1922,7 @@
 
   <xsl:choose>
       <xsl:when test="$pageclass = 'index'">
-          <xsl:attribute name="margin-left">0pt</xsl:attribute>
+          <xsl:attribute name="margin-{$direction.align.start}">0pt</xsl:attribute>
       </xsl:when>
   </xsl:choose>
 
@@ -1690,7 +1943,7 @@
   </xsl:variable>
 
   <xsl:variable name="candidate">
-    <fo:table table-layout="fixed" width="100%">
+    <fo:table xsl:use-attribute-sets="header.table.properties">
       <xsl:call-template name="head.sep.rule">
         <xsl:with-param name="pageclass" select="$pageclass"/>
         <xsl:with-param name="sequence" select="$sequence"/>
@@ -1733,7 +1986,7 @@
           <xsl:attribute name="block-progression-dimension.minimum">
             <xsl:value-of select="$header.table.height"/>
           </xsl:attribute>
-          <fo:table-cell text-align="left"
+          <fo:table-cell text-align="start"
                          display-align="before">
             <xsl:if test="$fop.extensions = 0">
               <xsl:attribute name="relative-align">baseline</xsl:attribute>
@@ -1742,7 +1995,7 @@
               <xsl:call-template name="header.content">
                 <xsl:with-param name="pageclass" select="$pageclass"/>
                 <xsl:with-param name="sequence" select="$sequence"/>
-                <xsl:with-param name="position" select="'left'"/>
+                <xsl:with-param name="position" select="$direction.align.start"/>
                 <xsl:with-param name="gentext-key" select="$gentext-key"/>
               </xsl:call-template>
             </fo:block>
@@ -1770,7 +2023,7 @@
               <xsl:call-template name="header.content">
                 <xsl:with-param name="pageclass" select="$pageclass"/>
                 <xsl:with-param name="sequence" select="$sequence"/>
-                <xsl:with-param name="position" select="'right'"/>
+                <xsl:with-param name="position" select="$direction.align.end"/>
                 <xsl:with-param name="gentext-key" select="$gentext-key"/>
               </xsl:call-template>
             </fo:block>
@@ -1994,7 +2247,7 @@
 
   <xsl:choose>
       <xsl:when test="$pageclass = 'index'">
-          <xsl:attribute name="margin-left">0pt</xsl:attribute>
+          <xsl:attribute name="margin-{$direction.align.start}">0pt</xsl:attribute>
       </xsl:when>
   </xsl:choose>
 
@@ -2015,7 +2268,7 @@
   </xsl:variable>
 
   <xsl:variable name="candidate">
-    <fo:table table-layout="fixed" width="100%">
+    <fo:table xsl:use-attribute-sets="footer.table.properties">
       <xsl:call-template name="foot.sep.rule">
         <xsl:with-param name="pageclass" select="$pageclass"/>
         <xsl:with-param name="sequence" select="$sequence"/>
@@ -2057,7 +2310,7 @@
           <xsl:attribute name="block-progression-dimension.minimum">
             <xsl:value-of select="$footer.table.height"/>
           </xsl:attribute>
-          <fo:table-cell text-align="left"
+          <fo:table-cell text-align="start"
                          display-align="after">
             <xsl:if test="$fop.extensions = 0">
               <xsl:attribute name="relative-align">baseline</xsl:attribute>
@@ -2066,7 +2319,7 @@
               <xsl:call-template name="footer.content">
                 <xsl:with-param name="pageclass" select="$pageclass"/>
                 <xsl:with-param name="sequence" select="$sequence"/>
-                <xsl:with-param name="position" select="'left'"/>
+                <xsl:with-param name="position" select="$direction.align.start"/>
                 <xsl:with-param name="gentext-key" select="$gentext-key"/>
               </xsl:call-template>
             </fo:block>
@@ -2085,7 +2338,7 @@
               </xsl:call-template>
             </fo:block>
           </fo:table-cell>
-          <fo:table-cell text-align="right"
+          <fo:table-cell text-align="end"
                          display-align="after">
             <xsl:if test="$fop.extensions = 0">
               <xsl:attribute name="relative-align">baseline</xsl:attribute>
@@ -2094,7 +2347,7 @@
               <xsl:call-template name="footer.content">
                 <xsl:with-param name="pageclass" select="$pageclass"/>
                 <xsl:with-param name="sequence" select="$sequence"/>
-                <xsl:with-param name="position" select="'right'"/>
+                <xsl:with-param name="position" select="$direction.align.end"/>
                 <xsl:with-param name="gentext-key" select="$gentext-key"/>
               </xsl:call-template>
             </fo:block>
@@ -2277,15 +2530,27 @@
   <!-- This template is called after each <fo:flow> starts. -->
   <!-- Customize this template to set attributes on fo:flow -->
 
+  <!-- remove -draft from reference -->
+  <xsl:variable name="pageclass">
+    <xsl:choose>
+      <xsl:when test="contains($master-reference, '-draft')">
+        <xsl:value-of select="substring-before($master-reference, '-draft')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$master-reference"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <xsl:choose>
     <xsl:when test="$fop.extensions != 0 or $passivetex.extensions != 0">
       <!-- body.start.indent does not work well with these processors -->
     </xsl:when>
-    <xsl:when test="starts-with($master-reference, 'body') or
-                    starts-with($master-reference, 'lot') or
-                    starts-with($master-reference, 'front') or
+    <xsl:when test="starts-with($pageclass, 'body') or
+                    starts-with($pageclass, 'lot') or
+                    starts-with($pageclass, 'front') or
                     $element = 'preface' or
-                    (starts-with($master-reference, 'back') and
+                    (starts-with($pageclass, 'back') and
                     $element = 'appendix')">
       <xsl:attribute name="start-indent">
         <xsl:value-of select="$body.start.indent"/>

@@ -4,12 +4,12 @@
                 exclude-result-prefixes="doc">
 
 <!-- ********************************************************************
-     $Id: maketoc.xsl 6403 2006-11-12 08:23:54Z bobstayton $
+     $Id: maketoc.xsl 6910 2007-06-28 23:23:30Z xmldoc $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 

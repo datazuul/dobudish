@@ -3,12 +3,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: sections.xsl 6434 2006-11-18 09:00:48Z bobstayton $
+     $Id: sections.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -20,11 +20,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
     <xsl:call-template name="section.titlepage"/>
 
     <xsl:variable name="toc.params">
@@ -101,11 +99,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
 
     <xsl:choose>
       <xsl:when test="@renderas = 'sect2'">
@@ -154,11 +150,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
 
     <xsl:choose>
       <xsl:when test="@renderas = 'sect1'">
@@ -207,11 +201,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
 
     <xsl:choose>
       <xsl:when test="@renderas = 'sect1'">
@@ -260,11 +252,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
 
     <xsl:choose>
       <xsl:when test="@renderas = 'sect1'">
@@ -313,11 +303,9 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
 
     <xsl:choose>
       <xsl:when test="@renderas = 'sect1'">
@@ -366,11 +354,10 @@
   <xsl:call-template name="id.warning"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
-    <xsl:call-template name="dir">
+    <xsl:call-template name="common.html.attributes">
       <xsl:with-param name="inherit" select="1"/>
     </xsl:call-template>
-    <xsl:call-template name="language.attribute"/>
+
     <xsl:call-template name="simplesect.titlepage"/>
     <xsl:apply-templates/>
   </div>
@@ -433,6 +420,12 @@
 
   <xsl:variable name="id">
     <xsl:choose>
+      <!-- Make sure the subtitle doesn't get the same id as the title -->
+      <xsl:when test="self::subtitle">
+        <xsl:call-template name="object.id">
+          <xsl:with-param name="object" select="."/>
+        </xsl:call-template>
+      </xsl:when>
       <!-- if title is in an *info wrapper, get the grandparent -->
       <xsl:when test="contains(local-name(..), 'info')">
         <xsl:call-template name="object.id">
@@ -465,11 +458,14 @@
         <xsl:attribute name="style">clear: both</xsl:attribute>
       </xsl:if>
     </xsl:if>
-    <xsl:if test="$allow-anchors != 0">
+    <xsl:if test="$allow-anchors != 0 and $generate.id.attributes = 0">
       <xsl:call-template name="anchor">
         <xsl:with-param name="node" select="$section"/>
         <xsl:with-param name="conditional" select="0"/>
       </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="$generate.id.attributes != 0 and not(local-name(.) = 'appendix')">
+      <xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
     </xsl:if>
     <xsl:copy-of select="$title"/>
   </xsl:element>

@@ -1,7 +1,7 @@
 # $Source$
 # $Author: xmldoc $
-# $Date: 2006-04-19 15:25:42 +0900 (Wed, 19 Apr 2006) $
-# $Revision: 5866 $
+# $Date: 2007-03-04 22:28:18 -0800 (Sun, 04 Mar 2007) $
+# $Revision: 6666 $
 # vim: number
 #
 # -----------------------------------------------------------------
@@ -21,7 +21,7 @@
 # of files per wrapper.
 #
 # Currently, this makefile has only a "man" target and is mainly
-# intended to speed up processing of large numbers if individual
+# intended to speed up processing of large numbers of individual
 # refentry instances.
 
 # What file extension do you use for DocBook source files?

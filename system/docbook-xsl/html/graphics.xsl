@@ -11,12 +11,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: graphics.xsl 6533 2007-01-20 08:51:43Z bobstayton $
+     $Id: graphics.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      Contributors:
      Colin Paul Adams, <colin@colina.demon.co.uk>
@@ -63,7 +63,7 @@
 
 <xsl:template match="screenshot">
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:apply-templates/>
   </div>
 </xsl:template>
@@ -248,10 +248,8 @@
   </xsl:variable>
 
   <xsl:variable name="img.src.path.pi">
-    <xsl:call-template name="dbhtml-attribute">
-      <xsl:with-param name="pis"
-                      select="../processing-instruction('dbhtml')"/>
-      <xsl:with-param name="attribute" select="'img.src.path'"/>
+    <xsl:call-template name="pi.dbhtml_img.src.path">
+      <xsl:with-param name="node" select=".."/>
     </xsl:call-template>
   </xsl:variable>
 
@@ -527,8 +525,19 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
   <xsl:variable name="img">
     <xsl:choose>
       <xsl:when test="@format = 'SVG'">
-        <object data="{$output_filename}" type="image/svg+xml">
-          <xsl:call-template name="process.image.attributes">
+        <object type="image/svg+xml">
+	  <xsl:attribute name="data">
+	    <xsl:choose>
+	      <xsl:when test="$img.src.path != '' and
+                           $tag = 'img' and
+			   not(starts-with($output_filename, '/')) and
+			   not(contains($output_filename, '://'))">
+		<xsl:value-of select="$img.src.path"/>
+	      </xsl:when>
+           </xsl:choose>
+	   <xsl:value-of select="$output_filename"/>
+	  </xsl:attribute>
+	  <xsl:call-template name="process.image.attributes">
             <!--xsl:with-param name="alt" select="$alt"/ there's no alt here-->
             <xsl:with-param name="html.depth" select="$html.depth"/>
             <xsl:with-param name="html.width" select="$html.width"/>
@@ -550,7 +559,18 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="$use.embed.for.svg != 0">
-            <embed src="{$output_filename}" type="image/svg+xml">
+	    <embed type="image/svg+xml">
+	      <xsl:attribute name="src">
+		<xsl:choose>
+                  <xsl:when test="$img.src.path != '' and
+				  $tag = 'img' and
+				  not(starts-with($output_filename, '/')) and
+				  not(contains($output_filename, '://'))">
+		    <xsl:value-of select="$img.src.path"/>
+                  </xsl:when>
+		</xsl:choose>
+		<xsl:value-of select="$output_filename"/>
+              </xsl:attribute>
               <xsl:call-template name="process.image.attributes">
                 <!--xsl:with-param name="alt" select="$alt"/ there's no alt here -->
                 <xsl:with-param name="html.depth" select="$html.depth"/>
@@ -641,10 +661,8 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
   </xsl:variable>
 
   <xsl:variable name="bgcolor">
-    <xsl:call-template name="dbhtml-attribute">
-      <xsl:with-param name="pis"
-                      select="../processing-instruction('dbhtml')"/>
-      <xsl:with-param name="attribute" select="'background-color'"/>
+    <xsl:call-template name="pi.dbhtml_background-color">
+      <xsl:with-param name="node" select=".."/>
     </xsl:call-template>
   </xsl:variable>
 
@@ -917,12 +935,12 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
   <xsl:choose>
     <xsl:when test="@contentwidth or @contentdepth">
       <!-- ignore @width/@depth, @scale, and @scalefit if specified -->
-      <xsl:if test="@contentwidth">
+      <xsl:if test="@contentwidth and $scaled.contentwidth != ''">
         <xsl:attribute name="width">
           <xsl:value-of select="$scaled.contentwidth"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@contentdepth">
+      <xsl:if test="@contentdepth and $scaled.contentdepth != ''">
         <xsl:attribute name="height">
           <xsl:value-of select="$scaled.contentdepth"/>
         </xsl:attribute>
@@ -1073,9 +1091,11 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
-          <a xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"
-             href="{$filename}"/>
-        </xsl:otherwise>
+	  <xsl:message terminate="yes">
+	    <xsl:text>Cannot insert </xsl:text><xsl:value-of select="$filename"/>
+	    <xsl:text>. Check use.extensions and textinsert.extension parameters.</xsl:text> 
+	  </xsl:message>
+	</xsl:otherwise>
       </xsl:choose>
     </xsl:when>
     <xsl:otherwise>
@@ -1106,7 +1126,7 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
   </xsl:variable>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:if test="$align != '' ">
       <xsl:attribute name="align">
         <xsl:value-of select="$align"/>
@@ -1121,7 +1141,7 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
 
 <xsl:template match="inlinemediaobject">
   <span>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:call-template name="anchor"/>
     <xsl:call-template name="select.mediaobject"/>
   </span>
@@ -1142,15 +1162,7 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
 </xsl:template>
 
 <xsl:template match="imageobject">
-  <xsl:choose>
-    <xsl:when xmlns:svg="http://www.w3.org/2000/svg"
-              test="svg:*">
-      <xsl:apply-templates/>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:apply-templates select="imagedata"/>
-    </xsl:otherwise>
-  </xsl:choose>
+  <xsl:apply-templates select="imagedata"/>
 </xsl:template>
 
 <xsl:template match="imagedata">
@@ -1161,6 +1173,15 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
   </xsl:variable>
 
   <xsl:choose>
+    <!-- Handle MathML and SVG markup in imagedata -->
+    <xsl:when test="mml:*" xmlns:mml="http://www.w3.org/1998/Math/MathML">
+      <xsl:apply-templates/>
+    </xsl:when>
+    
+    <xsl:when test="svg:*" xmlns:svg="http://www.w3.org/2000/svg">
+      <xsl:apply-templates/>
+    </xsl:when>
+
     <xsl:when test="@format='linespecific'">
       <xsl:choose>
         <xsl:when test="$use.extensions != '0'
@@ -1224,14 +1245,8 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
 
 <xsl:template name="longdesc.uri">
   <xsl:param name="mediaobject" select="."/>
-
   <xsl:if test="$html.longdesc">
     <xsl:if test="$mediaobject/textobject[not(phrase)]">
-      <xsl:variable name="image-id">
-        <xsl:call-template name="object.id">
-          <xsl:with-param name="object" select="$mediaobject"/>
-        </xsl:call-template>
-      </xsl:variable>
       <xsl:variable name="dbhtml.dir">
         <xsl:call-template name="dbhtml-dir"/>
       </xsl:variable>
@@ -1247,8 +1262,31 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
-          <xsl:with-param name="base.name"
-                          select="concat('ld-',$image-id,$html.ext)"/>
+          <xsl:with-param name="base.name">
+            <xsl:choose>
+              <xsl:when test="
+                $mediaobject/@*[local-name() = 'id']
+                and not($use.id.as.filename = 0)">
+                <!-- * if this mediaobject has an ID, then we use the -->
+                <!-- * value of that ID as basename for the "longdesc" -->
+                <!-- * file (that is, without prepending an "ld-" too it) -->
+                <xsl:value-of select="$mediaobject/@*[local-name() = 'id']"/>
+                <xsl:value-of select="$html.ext"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- * otherwise, if this mediaobject does not have an -->
+                <!-- * ID, then we generate an ID... -->
+                <xsl:variable name="image-id">
+                  <xsl:call-template name="object.id">
+                    <xsl:with-param name="object" select="$mediaobject"/>
+                  </xsl:call-template>
+                </xsl:variable>
+                <!-- * ...and then we take that generated ID, prepend an -->
+                <!-- * "ld-" to it, and use that as the basename for the file -->
+                <xsl:value-of select="concat('ld-',$image-id,$html.ext)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
@@ -1314,7 +1352,7 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
     </xsl:call-template>
   </xsl:variable>
 
-  <div class="longdesc-link" align="right">
+  <div class="longdesc-link" align="{$direction.align.end}">
     <br clear="all"/>
     <span class="longdesc-link">
       <xsl:text>[</xsl:text>
@@ -1401,8 +1439,10 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
       </xsl:choose>
     </xsl:when>
     <xsl:otherwise>
-      <a xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"
-         href="{$filename}"/>
+      <xsl:message terminate="yes">
+	<xsl:text>Cannot insert </xsl:text><xsl:value-of select="$filename"/>
+	<xsl:text>. Check use.extensions and textinsert.extension parameters.</xsl:text> 
+      </xsl:message>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -1411,7 +1451,7 @@ valign: <xsl:value-of select="@valign"/></xsl:message>
 
 <xsl:template match="caption">
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:if test="@align = 'right' or @align = 'left' or @align='center'">
       <xsl:attribute name="align"><xsl:value-of
                          select="@align"/></xsl:attribute>

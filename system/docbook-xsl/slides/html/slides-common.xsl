@@ -2,10 +2,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 		version="1.0">
 
-<xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
+<xsl:import href="../../html/chunk.xsl"/>
 <xsl:include href="../../VERSION"/>
 
-<xsl:include href="../param.xsl"/>
+<xsl:include href="param.xsl"/>
 <xsl:include href="jscript.xsl"/>
 <xsl:include href="graphics.xsl"/>
 <xsl:include href="css.xsl"/>
@@ -1432,7 +1432,7 @@
   <!-- returns the filename of a chunk -->
   <xsl:variable name="ischunk"><xsl:call-template name="chunk"/></xsl:variable>
   <xsl:variable name="filename">
-    <xsl:call-template name="dbhtml-filename"/>
+    <xsl:call-template name="pi.dbhtml_filename"/>
   </xsl:variable>
   <xsl:variable name="dir">
     <xsl:call-template name="dbhtml-dir"/>

@@ -3,12 +3,12 @@
                 version="1.0">
 
 <!-- ********************************************************************
-     $Id: autoidx-ng.xsl 6352 2006-10-10 14:10:29Z kosek $
+     $Id: autoidx-ng.xsl 6910 2007-06-28 23:23:30Z xmldoc $
      ********************************************************************
 
      This file is part of the DocBook XSL Stylesheet distribution.
      See ../README or http://docbook.sf.net/ for copyright
-     and other information.
+     copyright and other information.
 
      ******************************************************************** -->
 

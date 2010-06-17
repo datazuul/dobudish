@@ -5,7 +5,7 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: xep.xsl 6536 2007-01-21 08:37:12Z xmldoc $
+     $Id: xep.xsl 7531 2007-10-17 18:06:49Z dcramer $
      ********************************************************************
      (c) Stephane Bline Peregrine Systems 2001
      Implementation of xep extensions:
@@ -18,7 +18,8 @@
 
 <xsl:template name="xep-document-information">
   <rx:meta-info>
-    <xsl:variable name="authors" select="(//author|//editor|//corpauthor|//authorgroup)[1]"/>
+    <xsl:variable name="authors" 
+                  select="(//author|//editor|//corpauthor|//authorgroup)[1]"/>
     <xsl:if test="$authors">
       <xsl:variable name="author">
         <xsl:choose>
@@ -122,8 +123,8 @@
 
   <!-- Put the root element bookmark at the same level as its children -->
   <!-- If the object is a set or book, generate a bookmark for the toc -->
-
   <xsl:choose>
+    <xsl:when test="self::index and $generate.index = 0"/>	
     <xsl:when test="parent::*">
       <rx:bookmark internal-destination="{$id}">
         <rx:bookmark-label>

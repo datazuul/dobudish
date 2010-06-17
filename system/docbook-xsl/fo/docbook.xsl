@@ -13,12 +13,12 @@
 <xsl:output method="xml" indent="no"/>
 
 <!-- ********************************************************************
-     $Id: docbook.xsl 6465 2007-01-06 09:02:18Z bobstayton $
+     $Id: docbook.xsl 8414 2009-04-18 22:40:23Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -29,6 +29,7 @@
 <xsl:include href="../lib/lib.xsl"/>
 <xsl:include href="../common/l10n.xsl"/>
 <xsl:include href="../common/common.xsl"/>
+<xsl:include href="../common/utility.xsl"/>
 <xsl:include href="../common/labels.xsl"/>
 <xsl:include href="../common/titles.xsl"/>
 <xsl:include href="../common/subtitles.xsl"/>
@@ -61,6 +62,7 @@
 <xsl:include href="admon.xsl"/>
 <xsl:include href="component.xsl"/>
 <xsl:include href="biblio.xsl"/>
+<xsl:include href="biblio-iso690.xsl"/>
 <xsl:include href="glossary.xsl"/>
 <xsl:include href="block.xsl"/>
 <xsl:include href="task.xsl"/>
@@ -93,14 +95,18 @@
 
 <xsl:template match="*">
   <xsl:message>
-    <xsl:value-of select="name(.)"/>
-    <xsl:text> encountered</xsl:text>
+    <xsl:text>Element </xsl:text>
+    <xsl:value-of select="local-name(.)"/>
+    <xsl:text> in namespace '</xsl:text>
+    <xsl:value-of select="namespace-uri(.)"/>
+    <xsl:text>' encountered</xsl:text>
     <xsl:if test="parent::*">
       <xsl:text> in </xsl:text>
       <xsl:value-of select="name(parent::*)"/>
     </xsl:if>
     <xsl:text>, but no template matches.</xsl:text>
   </xsl:message>
+  
   <fo:block color="red">
     <xsl:text>&lt;</xsl:text>
     <xsl:value-of select="name(.)"/>
@@ -116,21 +122,40 @@
 <xsl:variable name="root.elements" select="' appendix article bibliography book chapter colophon dedication glossary index part preface qandaset refentry reference sect1 section set setindex '"/>
 
 <xsl:template match="/">
+  <!-- * Get a title for current doc so that we let the user -->
+  <!-- * know what document we are processing at this point. -->
+  <xsl:variable name="doc.title">
+    <xsl:call-template name="get.doc.title"/>
+  </xsl:variable>
   <xsl:choose>
-    <!-- include extra test for Xalan quirk -->
-    <xsl:when test="(function-available('exsl:node-set') or
-                     contains(system-property('xsl:vendor'),
-                       'Apache Software Foundation'))
+    <!-- Hack! If someone hands us a DocBook V5.x or DocBook NG document,
+         toss the namespace and continue.  Use the docbook5 namespaced
+         stylesheets for DocBook5 if you don't want to use this feature.-->
+    <xsl:when test="$exsl.node.set.available != 0
                     and (*/self::ng:* or */self::db:*)">
-      <!-- Hack! If someone hands us a DocBook V5.x or DocBook NG document,
-           toss the namespace and continue. Someday we'll reverse this logic
-           and add the namespace to documents that don't have one.
-           But not before the whole stylesheet has been converted to use
-           namespaces. i.e., don't hold your breath -->
-      <xsl:message>Stripping namespace from DocBook 5 document.</xsl:message>
+      <xsl:call-template name="log.message">
+        <xsl:with-param name="level">Note</xsl:with-param>
+        <xsl:with-param name="source" select="$doc.title"/>
+        <xsl:with-param name="context-desc">
+          <xsl:text>namesp. cut</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="message">
+          <xsl:text>stripped namespace before processing</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:variable name="nons">
         <xsl:apply-templates mode="stripNS"/>
       </xsl:variable>
+      <xsl:call-template name="log.message">
+        <xsl:with-param name="level">Note</xsl:with-param>
+        <xsl:with-param name="source" select="$doc.title"/>
+        <xsl:with-param name="context-desc">
+          <xsl:text>namesp. cut</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="message">
+          <xsl:text>processing stripped document</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:apply-templates select="exsl:node-set($nons)"/>
     </xsl:when>
     <!-- Can't process unless namespace removed -->
@@ -248,6 +273,7 @@
     </xsl:if>
 
     <xsl:if test="$fop1.extensions != 0">
+      <xsl:call-template name="fop1-document-information"/>
       <xsl:variable name="bookmarks">
         <xsl:apply-templates select="$document.element" 
                              mode="fop1.outline"/>

@@ -1,12 +1,14 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:exsl="http://exslt.org/common"
+                xmlns:ng="http://docbook.org/docbook-ng"
                 xmlns:db="http://docbook.org/ns/docbook"
+                xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0"
                 exclude-result-prefixes="exsl"
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: other.xsl 6536 2007-01-21 08:37:12Z xmldoc $
+     $Id: other.xsl 8235 2009-02-09 16:22:14Z xmldoc $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
@@ -19,7 +21,10 @@
 <!-- * just assembling the actual text of the main text flow of each man -->
 <!-- * page. This "other" stuff currently amounts to these steps: -->
 <!-- * -->
+<!-- *  - get contents of the "map" used to convert special characters -->
 <!-- *  - output boilerplate messages -->
+<!-- *  - escape backslash, dot, dash, and apostrophe characters -->
+<!-- *  - convert non-breaking spaces -->
 <!-- *  - add a comment to top part of roff source of each page -->
 <!-- *  - make a .TH title line (for controlling page header/footer) -->
 <!-- *  - set hyphenation, alignment, indent & line-breaking defaults -->
@@ -74,46 +79,6 @@ ooexception
 oointerface
 simplemsgentry
 manvolnum
-
-db:abstract db:affiliation db:anchor db:answer db:appendix db:area db:areaset db:areaspec
-db:artheader db:article db:audiodata db:audioobject db:author db:authorblurb db:authorgroup
-db:beginpage db:bibliodiv db:biblioentry db:bibliography db:biblioset db:blockquote db:book
-db:bookbiblio db:bookinfo db:callout db:calloutlist db:caption db:caution db:chapter
-db:citerefentry db:cmdsynopsis db:co db:collab db:colophon db:colspec db:confgroup
-db:copyright db:dedication db:docinfo db:editor db:entrytbl db:epigraph db:equation
-db:example db:figure db:footnote db:footnoteref db:formalpara db:funcprototype
-db:funcsynopsis db:glossary db:glossdef db:glossdiv db:glossentry db:glosslist db:graphicco
-db:group db:highlights db:imagedata db:imageobject db:imageobjectco db:important db:index
-db:indexdiv db:indexentry db:indexterm db:informalequation db:informalexample
-db:informalfigure db:informaltable db:inlineequation db:inlinemediaobject
-db:itemizedlist db:itermset db:keycombo db:keywordset db:legalnotice db:listitem db:lot
-db:mediaobject db:mediaobjectco db:menuchoice db:msg db:msgentry db:msgexplan db:msginfo
-db:msgmain db:msgrel db:msgset db:msgsub db:msgtext db:note db:objectinfo
-db:orderedlist db:othercredit db:part db:partintro db:preface db:printhistory db:procedure
-db:programlistingco db:publisher db:qandadiv db:qandaentry db:qandaset db:question
-db:refentry db:reference db:refmeta db:refnamediv db:refsection db:refsect1 db:refsect1info
-db:refsect2
-db:refsect2info db:refsect3 db:refsect3info db:refsynopsisdiv db:refsynopsisdivinfo
-db:revhistory db:revision db:row db:sbr db:screenco db:screenshot db:sect1 db:sect1info db:sect2
-db:sect2info db:sect3 db:sect3info db:sect4 db:sect4info db:sect5 db:sect5info db:section
-db:sectioninfo db:seglistitem db:segmentedlist db:seriesinfo db:set db:setindex db:setinfo
-db:shortcut db:sidebar db:simplelist db:simplesect db:spanspec db:step db:subject
-db:subjectset db:substeps db:synopfragment db:table db:tbody db:textobject db:tfoot db:tgroup
-db:thead db:tip db:toc db:tocchap db:toclevel1 db:toclevel2 db:toclevel3 db:toclevel4
-db:toclevel5 db:tocpart db:varargs db:variablelist db:varlistentry db:videodata
-db:videoobject db:void db:warning db:subjectset
-
-db:classsynopsis
-db:constructorsynopsis
-db:destructorsynopsis
-db:fieldsynopsis
-db:methodparam
-db:methodsynopsis
-db:ooclass
-db:ooexception
-db:oointerface
-db:simplemsgentry
-db:manvolnum
 "/>
 
 <!-- ==================================================================== -->
@@ -122,9 +87,23 @@ db:manvolnum
 
   <xsl:variable name="man.charmap.contents">
     <xsl:if test="$man.charmap.enabled != 0">
+      <xsl:variable name="lang">
+        <xsl:call-template name="l10n.language">
+          <xsl:with-param name="target" select="//refentry[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
       <xsl:call-template name="read-character-map">
         <xsl:with-param name="use.subset" select="$man.charmap.use.subset"/>
-        <xsl:with-param name="subset.profile" select="$man.charmap.subset.profile"/>
+        <xsl:with-param name="subset.profile">
+          <xsl:choose>
+            <xsl:when test="$lang = 'en'">
+              <xsl:value-of select="$man.charmap.subset.profile.english"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$man.charmap.subset.profile"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
         <xsl:with-param name="uri">
           <xsl:choose>
             <xsl:when test="$man.charmap.uri != ''">
@@ -145,17 +124,135 @@ db:manvolnum
   <xsl:param name="refname"/>
   <!-- redefine this any way you'd like to output messages -->
   <!-- DO NOT OUTPUT ANYTHING FROM THIS TEMPLATE -->
-  <!--
-  <xsl:if test="//footnote">
+  <!-- Example:
+  <xsl:if test="//foo">
     <xsl:call-template name="log.message">
       <xsl:with-param name="level">Warn</xsl:with-param>
       <xsl:with-param name="source" select="$refname"/>
-      <xsl:with-param
-          name="message"
-          >Output for footnote element is not yet supported.</xsl:with-param>
+      <xsl:with-param name="context-desc">
+        <xsl:text>limitation</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="message">
+        <xsl:text>Output for foo element is not yet supported.</xsl:text>
+      </xsl:with-param>
     </xsl:call-template>
   </xsl:if>
   -->
+</xsl:template>
+
+<!-- ==================================================================== -->
+<!-- * Escape roff special chars -->
+<!-- ==================================================================== -->
+
+<!-- ******************************************************************** -->
+<!-- *  -->
+<!-- * The backslash, dot, dash, and apostrophe (\, ., -, ') characters -->
+<!-- * have special meaning for roff, so before we do any other -->
+<!-- * processing, we must escape those characters where they appear in -->
+<!-- * the source content. -->
+<!-- *  -->
+<!-- * Here we also deal with replacing U+00a0 (non-breaking space) with -->
+<!-- * its roff equivalent -->
+<!-- *  -->
+<!-- ******************************************************************** -->
+
+<xsl:template match="//refentry//text()">
+  <xsl:call-template name="escape.roff.specials">
+    <xsl:with-param name="content">
+      <xsl:value-of select="."/>
+    </xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="escape.roff.specials">
+  <xsl:param name="content"/>
+  <xsl:call-template name="convert.nobreak-space">
+    <xsl:with-param name="content">
+      <xsl:call-template name="escape.apostrophe">
+        <xsl:with-param name="content">
+          <xsl:call-template name="escape.dash">
+            <xsl:with-param name="content">
+              <xsl:call-template name="escape.dot">
+                <xsl:with-param name="content">
+                  <xsl:call-template name="escape.backslash">
+                    <xsl:with-param name="content" select="$content"/>
+                  </xsl:call-template>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="escape.backslash">
+  <xsl:param name="content"/>
+  <xsl:call-template name="string.subst">
+    <xsl:with-param name="string" select="$content"/>
+    <xsl:with-param name="target">\</xsl:with-param>
+    <!-- * we use "\e" instead of "\\" because the groff docs say -->
+    <!-- * that's the correct thing to do; also because testing -->
+    <!-- * shows that "\\" doesn't always work as expected; for -->
+    <!-- * example, "\\" within a table seems to mess things up -->
+    <xsl:with-param name="replacement">\e</xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="escape.dot">
+  <xsl:param name="content"/>
+  <xsl:call-template name="string.subst">
+    <xsl:with-param name="string" select="$content"/>
+    <xsl:with-param name="target">.</xsl:with-param>
+    <xsl:with-param name="replacement">\&amp;.</xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="escape.dash">
+  <xsl:param name="content"/>
+  <xsl:call-template name="string.subst">
+    <xsl:with-param name="string" select="$content"/>
+    <xsl:with-param name="target">-</xsl:with-param>
+    <xsl:with-param name="replacement">\-</xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="escape.apostrophe">
+  <xsl:param name="content"/>
+  <xsl:call-template name="string.subst">
+    <xsl:with-param name="string" select="$content"/>
+    <xsl:with-param name="target">'</xsl:with-param>
+    <xsl:with-param name="replacement">\'</xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="convert.nobreak-space">
+  <xsl:param name="content"/>
+  <xsl:call-template name="string.subst">
+    <xsl:with-param name="string" select="$content"/>
+    <xsl:with-param name="target">&#x00a0;</xsl:with-param>
+    <!-- * A no-break space can be written two ways in roff; the -->
+    <!-- * difference, according to the "Page Motions" node in the -->
+    <!-- * groff info page, is: -->
+    <!-- *  -->
+    <!-- *   "\ " = -->
+    <!-- *   An unbreakable and unpaddable (i.e. not expanded -->
+    <!-- *   during filling) space. -->
+    <!-- *  -->
+    <!-- *   "\~" = -->
+    <!-- *   An unbreakable space that stretches like a normal -->
+    <!-- *   inter-word space when a line is adjusted."  -->
+    <!-- *  -->
+    <!-- * Unfortunately, roff seems to do some weird things with -->
+    <!-- * long lines that only have words separated by "\~" -->
+    <!-- * spaces, so it's safer just to stick with the "\ " space -->
+    <!-- *  -->
+    <!-- * We append a "\&" to handle the case of a no-break space that -->
+    <!-- * appears at the end of a line - because later processing will -->
+    <!-- * cause that space to get eaten otherwise. -->
+    <xsl:with-param name="replacement">\ \&amp;</xsl:with-param>
+  </xsl:call-template>
 </xsl:template>
 
 <!-- ==================================================================== -->
@@ -169,44 +266,49 @@ db:manvolnum
     <xsl:param name="title"/>
     <xsl:param name="manual"/>
     <xsl:param name="source"/>
-    <xsl:text>&#x2302;&#x2593;"     Title: </xsl:text>
+    <xsl:param name="refname"/>
+    <xsl:text>.\"     Title: </xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content" select="$title"/>
     </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;"    Author: </xsl:text>
+    <xsl:text>.\"    Author: </xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content">
         <xsl:call-template name="make.roff.metadata.author">
           <xsl:with-param name="info" select="$info"/>
+          <xsl:with-param name="refname" select="$refname"/>
         </xsl:call-template>
       </xsl:with-param>
     </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;" Generator: DocBook </xsl:text>
+    <xsl:text>.\" Generator: DocBook </xsl:text>
     <xsl:value-of select="$DistroTitle"/>
     <xsl:text> v</xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content" select="$VERSION"/>
     </xsl:call-template>
-    <xsl:text> &lt;http://docbook&#x2302;sf&#x2302;net/></xsl:text>
+    <xsl:text> &lt;http://docbook.sf.net/></xsl:text>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;"      Date: </xsl:text>
+    <xsl:text>.\"      Date: </xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content" select="$date"/>
     </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;"    Manual: </xsl:text>
+    <xsl:text>.\"    Manual: </xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content" select="$manual"/>
     </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;"    Source: </xsl:text>
+    <xsl:text>.\"    Source: </xsl:text>
     <xsl:call-template name="replace.dots.and.dashes">
       <xsl:with-param name="content" select="$source"/>
     </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>&#x2302;&#x2593;"</xsl:text>
+    <xsl:text>.\"  Language: </xsl:text>
+    <xsl:call-template name="l10.language.name"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>.\"</xsl:text>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
@@ -255,7 +357,7 @@ db:manvolnum
     <!-- * is", unchanged from the DocBook source; and DTD-based -->
     <!-- * validation does not provide a way to constrain them to be -->
     <!-- * "space free" -->
-    <xsl:text>&#x2302;TH "</xsl:text>
+    <xsl:text>.TH "</xsl:text>
     <xsl:call-template name="string.upper">
       <xsl:with-param name="string">
         <xsl:choose>
@@ -316,33 +418,36 @@ db:manvolnum
     <!-- * -->
     <!-- * If the value of man.hypenate is zero (the default), then -->
     <!-- * disable hyphenation (".nh" = "no hyphenation") -->
+    <xsl:text>.\" -----------------------------------------------------------------&#10;</xsl:text>
+    <xsl:text>.\" * set default formatting&#10;</xsl:text>
+    <xsl:text>.\" -----------------------------------------------------------------&#10;</xsl:text>
     <xsl:if test="$man.hyphenate = 0">
-      <xsl:text>&#x2302;&#x2593;" disable hyphenation&#10;</xsl:text>
-      <xsl:text>&#x2302;nh&#10;</xsl:text>
+      <xsl:text>.\" disable hyphenation&#10;</xsl:text>
+      <xsl:text>.nh&#10;</xsl:text>
     </xsl:if>
     <!-- * If the value of man.justify is zero (the default), then -->
     <!-- * disable justification (".ad l" means "adjust to left only") -->
     <xsl:if test="$man.justify = 0">
-      <xsl:text>&#x2302;&#x2593;" disable justification</xsl:text>
+      <xsl:text>.\" disable justification</xsl:text>
       <xsl:text> (adjust text to left margin only)&#10;</xsl:text>
-      <xsl:text>&#x2302;ad l&#10;</xsl:text>
+      <xsl:text>.ad l&#10;</xsl:text>
     </xsl:if>
     <xsl:if test="not($man.indent.refsect = 0)">
-      <xsl:text>&#x2302;&#x2593;" store initial "default indentation value"&#10;</xsl:text>
-      <xsl:text>&#x2302;nr zq &#x2593;n(IN&#10;</xsl:text>
-      <xsl:text>&#x2302;&#x2593;" adjust default indentation&#10;</xsl:text>
-      <xsl:text>&#x2302;nr IN </xsl:text>
+      <xsl:text>.\" store initial "default indentation value"&#10;</xsl:text>
+      <xsl:text>.nr zq \n(IN&#10;</xsl:text>
+      <xsl:text>.\" adjust default indentation&#10;</xsl:text>
+      <xsl:text>.nr IN </xsl:text>
       <xsl:value-of select="$man.indent.width"/>
       <xsl:text>&#10;</xsl:text>
-      <xsl:text>&#x2302;&#x2593;" adjust indentation of SS headings&#10;</xsl:text>
-      <xsl:text>&#x2302;nr SN &#x2593;n(IN&#10;</xsl:text>
+      <xsl:text>.\" adjust indentation of SS headings&#10;</xsl:text>
+      <xsl:text>.nr SN \n(IN&#10;</xsl:text>
     </xsl:if>
     <!-- * Unless the value of man.break.after.slash is zero (the -->
     <!-- * default), tell groff that it is OK to break a line -->
     <!-- * after a slash when needed. -->
     <xsl:if test="$man.break.after.slash != 0">
-      <xsl:text>&#x2302;&#x2593;" enable line breaks after slashes&#10;</xsl:text>
-      <xsl:text>&#x2302;cflags 4 /&#10;</xsl:text>
+      <xsl:text>.\" enable line breaks after slashes&#10;</xsl:text>
+      <xsl:text>.cflags 4 /&#10;</xsl:text>
     </xsl:if>
   </xsl:template>
 
@@ -480,9 +585,7 @@ db:manvolnum
         <xsl:call-template name="write.text.chunk">
           <xsl:with-param name="filename">
             <xsl:call-template name="make.adjusted.man.filename">
-              <xsl:with-param name="name">
-                <xsl:apply-templates/>
-              </xsl:with-param>
+              <xsl:with-param name="name" select="."/>
               <xsl:with-param name="section" select="$section"/>
               <xsl:with-param name="lang" select="$lang"/>
             </xsl:call-template>
@@ -552,5 +655,215 @@ db:manvolnum
       <xsl:message><xsl:text>&#10;</xsl:text></xsl:message>
     </xsl:if>
   </xsl:template>
+
+  <!-- ============================================================== -->
+
+  <xsl:template name="define.macros">
+    <xsl:text>.\" -----------------------------------------------------------------&#10;</xsl:text>
+    <xsl:text>.\" * (re)Define some macros&#10;</xsl:text>
+    <xsl:text>.\" -----------------------------------------------------------------&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" toupper - uppercase a string (locale-aware)&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de toupper&#10;</xsl:text>
+    <xsl:text>.tr</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:call-template name="make.tr.uppercase.arg"/>
+    <xsl:text>\\$*&#10;</xsl:text>
+    <xsl:text>.tr</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:call-template name="make.tr.normalcase.arg"/>
+    <xsl:text>..&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" SH-xref - format a cross-reference to an SH section&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de SH-xref
+.ie n \{\
+.\}
+.toupper \\$*
+.el \{\
+\\$*
+.\}
+..&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" SH - level-one heading that works better for non-TTY output&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de1 SH&#10;</xsl:text>
+    <xsl:text>.\" put an extra blank line of space above the head in non-TTY output&#10;</xsl:text>
+    <xsl:call-template name="roff-if-start">
+      <xsl:with-param name="condition">t</xsl:with-param>
+    </xsl:call-template>
+    <xsl:text>.sp 1&#10;</xsl:text>
+    <xsl:call-template name="roff-if-end"/>
+    <xsl:text>.sp \\n[PD]u
+.nr an-level 1
+.set-an-margin
+.nr an-prevailing-indent \\n[IN]
+.fi
+.in \\n[an-margin]u
+.ti 0
+.HTML-TAG ".NH \\n[an-level]"
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+\." make the size of the head bigger
+.ps +3
+.ft B
+.ne (2v + 1u)
+.ie n \{\
+.\" if n (TTY output), use uppercase
+.toupper \\$*
+.\}
+.el \{\
+.nr an-break-flag 0
+.\" if not n (not TTY), use normal case (not uppercase)
+\\$1
+.in \\n[an-margin]u
+.ti 0
+.\" if not n (not TTY), put a border/line under subheading
+.sp -.6
+\l'\n(.lu'
+.\}
+..&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" SS - level-two heading that works better for non-TTY output&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de1 SS
+.sp \\n[PD]u
+.nr an-level 1
+.set-an-margin
+.nr an-prevailing-indent \\n[IN]
+.fi
+.in \\n[IN]u
+.ti \\n[SN]u
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.ps \\n[PS-SS]u
+\." make the size of the head bigger
+.ps +2
+.ft B
+.ne (2v + 1u)
+.if \\n[.$] \&amp;\\$*
+..&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" BB/EB - put background/screen (filled box) around block of text&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de BB
+.if t \{\
+.sp -.5
+.br
+.in +2n
+.ll -2n
+.gcolor red
+.di BX
+.\}
+..
+.de EB
+.if t \{\
+.if "\\$2"adjust-for-leading-newline" \{\
+.sp -1
+.\}
+.br
+.di
+.in
+.ll
+.gcolor
+.nr BW \\n(.lu-\\n(.i
+.nr BH \\n(dn+.5v
+.ne \\n(BHu+.5v
+.ie "\\$2"adjust-for-leading-newline" \{\
+\M[\\$1]\h'1n'\v'+.5v'\D'P \\n(BWu 0 0 \\n(BHu -\\n(BWu 0 0 -\\n(BHu'\M[]
+.\}
+.el \{\
+\M[\\$1]\h'1n'\v'-.5v'\D'P \\n(BWu 0 0 \\n(BHu -\\n(BWu 0 0 -\\n(BHu'\M[]
+.\}
+.in 0
+.sp -.5v
+.nf
+.BX
+.in
+.sp .5v
+.fi
+.\}
+..&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.\" BM/EM - put colored marker in margin next to block of text&#10;</xsl:text>
+    <xsl:text>.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#10;</xsl:text>
+    <xsl:text>.de BM
+.if t \{\
+.br
+.ll -2n
+.gcolor red
+.di BX
+.\}
+..
+.de EM
+.if t \{\
+.br
+.di
+.ll
+.gcolor
+.nr BH \\n(dn
+.ne \\n(BHu
+\M[\\$1]\D'P -.75n 0 0 \\n(BHu -(\\n[.i]u - \\n(INu - .75n) 0 0 -\\n(BHu'\M[]
+.in 0
+.nf
+.BX
+.in
+.fi
+.\}
+..&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template name="make.tr.uppercase.arg">
+  <xsl:call-template name="string.shuffle">
+    <xsl:with-param name="string1">
+      <xsl:call-template name="gentext">
+        <xsl:with-param name="key" select="'lowercase.alpha'"/>
+      </xsl:call-template>
+    </xsl:with-param>
+    <xsl:with-param name="string2">
+      <xsl:call-template name="gentext">
+        <xsl:with-param name="key" select="'uppercase.alpha'"/>
+      </xsl:call-template>
+    </xsl:with-param>
+  </xsl:call-template>
+  <xsl:text>&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template name="make.tr.normalcase.arg">
+  <xsl:call-template name="string.shuffle">
+    <xsl:with-param name="string1">
+      <xsl:call-template name="gentext">
+        <xsl:with-param name="key" select="'lowercase.alpha'"/>
+      </xsl:call-template>
+    </xsl:with-param>
+    <xsl:with-param name="string2">
+      <xsl:call-template name="gentext">
+        <xsl:with-param name="key" select="'lowercase.alpha'"/>
+      </xsl:call-template>
+    </xsl:with-param>
+  </xsl:call-template>
+  <xsl:text>&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template name="string.shuffle">
+  <!-- * given two strings, "shuffle" them together into one -->
+  <xsl:param name="string1"/>
+  <xsl:param name="string2"/>
+  <xsl:value-of select="substring($string1, 1, 1)"/>
+  <xsl:value-of select="substring($string2, 1, 1)"/>
+  <xsl:if test="string-length($string1) > 1">
+    <xsl:call-template name="string.shuffle">
+      <xsl:with-param name="string1">
+        <xsl:value-of select="substring($string1, 2)"/>
+      </xsl:with-param>
+      <xsl:with-param name="string2">
+        <xsl:value-of select="substring($string2, 2)"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
 
 </xsl:stylesheet>

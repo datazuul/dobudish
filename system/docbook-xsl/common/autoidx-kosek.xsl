@@ -14,12 +14,12 @@
                 xmlns:i="urn:cz-kosek:functions:index">
 
 <!-- ********************************************************************
-     $Id: autoidx-kosek.xsl 6220 2006-08-30 06:23:19Z bobstayton $
+     $Id: autoidx-kosek.xsl 6910 2007-06-28 23:23:30Z xmldoc $
      ********************************************************************
 
      This file is part of the DocBook XSL Stylesheet distribution.
      See ../README or http://docbook.sf.net/ for copyright
-     and other information.
+     copyright and other information.
 
      ******************************************************************** -->
 

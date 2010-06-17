@@ -4,12 +4,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: titlepage.xsl 6402 2006-11-12 08:23:21Z bobstayton $
+     $Id: titlepage.xsl 8346 2009-03-16 07:09:41Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -48,6 +48,9 @@
 
 <xsl:attribute-set name="dedication.titlepage.recto.style"/>
 <xsl:attribute-set name="dedication.titlepage.verso.style"/>
+
+<xsl:attribute-set name="acknowledgements.titlepage.recto.style"/>
+<xsl:attribute-set name="acknowledgements.titlepage.verso.style"/>
 
 <xsl:attribute-set name="preface.titlepage.recto.style"/>
 <xsl:attribute-set name="preface.titlepage.verso.style"/>
@@ -190,13 +193,20 @@
 </xsl:template>
 
 <xsl:template match="abstract" mode="titlepage.mode">
-  <fo:block>
-    <xsl:call-template name="formal.object.heading">
-      <xsl:with-param name="title">
-        <xsl:apply-templates select="." mode="title.markup"/>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:apply-templates mode="titlepage.mode"/>
+  <fo:block xsl:use-attribute-sets="abstract.properties">
+    <fo:block xsl:use-attribute-sets="abstract.title.properties">
+      <xsl:choose>
+	<xsl:when test="title|info/title">
+	  <xsl:apply-templates select="title|info/title"/>
+	</xsl:when>
+	<xsl:otherwise>
+	  <xsl:call-template name="gentext">
+	    <xsl:with-param name="key" select="'Abstract'"/>
+	  </xsl:call-template>
+	</xsl:otherwise>
+      </xsl:choose>
+    </fo:block>
+    <xsl:apply-templates select="*[not(self::title)]" mode="titlepage.mode"/>
   </fo:block>
 </xsl:template>
 
@@ -322,6 +332,9 @@
 
 <xsl:template match="holder" mode="titlepage.mode">
   <xsl:apply-templates/>
+  <xsl:if test="position() &lt; last()">
+    <xsl:text>, </xsl:text>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="corpauthor" mode="titlepage.mode">
@@ -514,11 +527,7 @@
 <xsl:template match="revhistory" mode="titlepage.mode">
 
   <xsl:variable name="explicit.table.width">
-    <xsl:call-template name="dbfo-attribute">
-      <xsl:with-param name="pis"
-                      select="processing-instruction('dbfo')"/>
-      <xsl:with-param name="attribute" select="'table-width'"/>
-    </xsl:call-template>
+    <xsl:call-template name="pi.dbfo_table-width"/>
   </xsl:variable>
 
   <xsl:variable name="table.width">
@@ -535,7 +544,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <fo:table table-layout="fixed" width="{$table.width}" xsl:use-attribute-sets="revhistory.table.properties">
+ <fo:table table-layout="fixed" width="{$table.width}" xsl:use-attribute-sets="revhistory.table.properties">
     <fo:table-column column-number="1" column-width="proportional-column-width(1)"/>
     <fo:table-column column-number="2" column-width="proportional-column-width(1)"/>
     <fo:table-column column-number="3" column-width="proportional-column-width(1)"/>
@@ -543,16 +552,25 @@
       <fo:table-row>
         <fo:table-cell number-columns-spanned="3" xsl:use-attribute-sets="revhistory.table.cell.properties">
           <fo:block xsl:use-attribute-sets="revhistory.title.properties">
-            <xsl:call-template name="gentext">
-              <xsl:with-param name="key" select="'RevHistory'"/>
-            </xsl:call-template>
-          </fo:block>
+	    <xsl:choose>
+	      <xsl:when test="title|info/title">
+		<xsl:apply-templates select="title|info/title" mode="titlepage.mode"/>
+	      </xsl:when>
+	      <xsl:otherwise>
+		<xsl:call-template name="gentext">
+		  <xsl:with-param name="key" select="'RevHistory'"/>
+		</xsl:call-template>
+	      </xsl:otherwise>
+	    </xsl:choose>
+	  </fo:block>
         </fo:table-cell>
       </fo:table-row>
-      <xsl:apply-templates mode="titlepage.mode"/>
+      <xsl:apply-templates select="*[not(self::title)]" mode="titlepage.mode"/>
     </fo:table-body>
   </fo:table>
+
 </xsl:template>
+
 
 <xsl:template match="revhistory/revision" mode="titlepage.mode">
   <xsl:variable name="revnumber" select="revnumber"/>
@@ -663,7 +681,7 @@
 
 <!-- book recto -->
 
-<xsl:template match="bookinfo/authorgroup|info/authorgroup"
+<xsl:template match="bookinfo/authorgroup|book/info/authorgroup"
               mode="titlepage.mode" priority="2">
   <fo:block>
     <xsl:call-template name="anchor"/>
@@ -712,25 +730,25 @@
   <xsl:apply-templates select="othercredit" mode="titlepage.mode"/>
 </xsl:template>
 
-<xsl:template match="bookinfo/author|info/author"
+<xsl:template match="bookinfo/author|book/info/author"
               mode="titlepage.mode" priority="2">
   <fo:block>
     <xsl:call-template name="person.name"/>
   </fo:block>
 </xsl:template>
 
-<xsl:template match="bookinfo/corpauthor|info/corpauthor"
+<xsl:template match="bookinfo/corpauthor|book/info/corpauthor"
               mode="titlepage.mode" priority="2">
   <fo:block>
     <xsl:apply-templates/>
   </fo:block>
 </xsl:template>
 
-<xsl:template match="bookinfo/pubdate|info/pubdate"
+<xsl:template match="bookinfo/pubdate|book/info/pubdate"
               mode="titlepage.mode" priority="2">
   <fo:block>
     <xsl:call-template name="gentext">
-      <xsl:with-param name="key" select="'published'"/>
+      <xsl:with-param name="key" select="'pubdate'"/>
     </xsl:call-template>
     <xsl:text> </xsl:text>
     <xsl:apply-templates mode="titlepage.mode"/>

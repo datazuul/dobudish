@@ -5,51 +5,69 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: inline.xsl 5953 2006-05-08 04:23:10Z bobstayton $
+     $Id: highlight.xsl 8419 2009-04-29 20:37:52Z kosek $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
      and other information.
 
      ******************************************************************** -->
 
-<xsl:template match='xslthl:keyword'>
-  <b class="hl-keyword"><xsl:apply-templates/></b>
+<xsl:import href="../highlighting/common.xsl"/>
+
+<xsl:template match='xslthl:keyword' mode="xslthl">
+  <b class="hl-keyword"><xsl:apply-templates mode="xslthl"/></b>
 </xsl:template>
 
-<xsl:template match='xslthl:string'>
-  <b class="hl-string"><i><font color='red'><xsl:apply-templates/></font></i></b>
+<xsl:template match='xslthl:string' mode="xslthl">
+  <b class="hl-string"><i style="color:red"><xsl:apply-templates mode="xslthl"/></i></b>
 </xsl:template>
 
-<xsl:template match='xslthl:comment'>
-  <i class="hl-comment"><font color='silver'><xsl:apply-templates/></font></i>
+<xsl:template match='xslthl:comment' mode="xslthl">
+  <i class="hl-comment" style="color: silver"><xsl:apply-templates mode="xslthl"/></i>
 </xsl:template>
 
-<xsl:template match='xslthl:tag'>
-  <b class="hl-tag"><font color='blue'><xsl:apply-templates/></font></b>
+<xsl:template match='xslthl:directive' mode="xslthl">
+  <span class="hl-directive" style="color: maroon"><xsl:apply-templates mode="xslthl"/></span>
 </xsl:template>
 
-<xsl:template match='xslthl:attribute'>
-  <span class="hl-attribute"><font color='blue'><xsl:apply-templates/></font></span>
+<xsl:template match='xslthl:tag' mode="xslthl">
+  <b class="hl-tag" style="color: #000096"><xsl:apply-templates mode="xslthl"/></b>
 </xsl:template>
 
-<xsl:template match='xslthl:value'>
-  <span class="hl-value"><font color='blue'><xsl:apply-templates/></font></span>
+<xsl:template match='xslthl:attribute' mode="xslthl">
+  <span class="hl-attribute" style="color: #F5844C"><xsl:apply-templates mode="xslthl"/></span>
 </xsl:template>
 
-<xsl:template match='xslthl:html'>
-  <b><i><font color='red'><xsl:apply-templates/></font></i></b>
+<xsl:template match='xslthl:value' mode="xslthl">
+  <span class="hl-value" style="color: #993300"><xsl:apply-templates mode="xslthl"/></span>
 </xsl:template>
 
-<xsl:template match='xslthl:xslt'>
-  <b><font color='blue'><xsl:apply-templates/></font></b>
+<xsl:template match='xslthl:html' mode="xslthl">
+  <b><i style="color: red"><xsl:apply-templates mode="xslthl"/></i></b>
 </xsl:template>
 
-<xsl:template match='xslthl:section'>
-  <b><xsl:apply-templates/></b>
+<xsl:template match='xslthl:xslt' mode="xslthl">
+  <b style="color: #0066FF"><xsl:apply-templates mode="xslthl"/></b>
 </xsl:template>
 
+<!-- Not emitted since XSLTHL 2.0 -->
+<xsl:template match='xslthl:section' mode="xslthl">
+  <b><xsl:apply-templates mode="xslthl"/></b>
+</xsl:template>
+
+<xsl:template match='xslthl:number' mode="xslthl">
+  <span class="hl-number"><xsl:apply-templates mode="xslthl"/></span>
+</xsl:template>
+
+<xsl:template match='xslthl:annotation' mode="xslthl">
+  <i><span class="hl-annotation" style="color: gray"><xsl:apply-templates mode="xslthl"/></span></i>
+</xsl:template>
+
+<!-- Not sure which element will be in final XSLTHL 2.0 -->
+<xsl:template match='xslthl:doccomment|xslthl:doctype' mode="xslthl">
+  <b class="hl-tag" style="color: blue"><xsl:apply-templates mode="xslthl"/></b>
+</xsl:template>
 
 </xsl:stylesheet>
-

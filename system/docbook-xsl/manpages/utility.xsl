@@ -7,7 +7,7 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: utility.xsl 6529 2007-01-19 10:48:59Z xmldoc $
+     $Id: utility.xsl 8236 2009-02-09 17:44:52Z xmldoc $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
@@ -24,9 +24,9 @@
 <!-- ==================================================================== -->
 
   <!-- * NOTE TO DEVELOPERS: For ease of maintenance, the current -->
-  <!-- * manpages stylesheets use the mode="bold" and mode="italic" -->
-  <!-- * templates for *anything and everything* that needs to get -->
-  <!-- * boldfaced or italicized.   -->
+  <!-- * manpages stylesheets use the "bold" and "italic" named -->
+  <!-- * templates for anything and everything that needs to get -->
+  <!-- * boldfaced or italicized. -->
   <!-- * -->
   <!-- * So if you add anything that needs bold or italic character -->
   <!-- * formatting, try to apply these templates to it rather than -->
@@ -35,27 +35,84 @@
   <!-- * cases, you need to turn it into element content before applying -->
   <!-- * the template; see examples of this in the existing code. -->
 
-  <xsl:template mode="bold" match="*">
-    <xsl:for-each select="node()">
-      <xsl:text>&#x2593;fB</xsl:text>
+  <xsl:template name="bold">
+    <xsl:param name="node"/>
+    <xsl:param name="context"/>
+    <xsl:choose>
+      <xsl:when test="not($context[ancestor::title])">
+        <xsl:for-each select="$node/node()">
+          <xsl:text>\fB</xsl:text>
+          <xsl:apply-templates select="."/>
+          <xsl:text>\fR</xsl:text>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="$node/node()"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="italic">
+    <xsl:param name="node"/>
+    <xsl:param name="context"/>
+    <xsl:for-each select="$node/node()">
+      <xsl:text>\fI</xsl:text>
       <xsl:apply-templates select="."/>
-      <xsl:text>&#x2593;fR</xsl:text>
+      <xsl:text>\fR</xsl:text>
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template mode="italic" match="*">
-    <xsl:for-each select="node()">
-      <xsl:text>&#x2593;fI</xsl:text>
-      <xsl:apply-templates select="."/>
-      <xsl:text>&#x2593;fR</xsl:text>
-    </xsl:for-each>
+  <xsl:template name="inline.monoseq">
+    <xsl:call-template name="code-inline-start"/>
+    <xsl:apply-templates/>
+    <xsl:call-template name="code-inline-end"/>
+  </xsl:template>
+
+  <xsl:template name="code-inline-start">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>\FC</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="code-inline-end">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>\F[]</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- ================================================================== -->
+
+  <xsl:template name="verbatim-block-start">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>.fam C&#10;</xsl:text>
+      <xsl:text>.ps -1&#10;</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="verbatim-block-end">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>.fam&#10;</xsl:text>
+      <xsl:text>.ps +1&#10;</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="synopsis-block-start">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>.fam C&#10;</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="synopsis-block-end">
+    <xsl:if test="not($man.output.better.ps.enabled = 0)">
+      <xsl:text>.fam&#10;</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <!-- ================================================================== -->
 
   <!-- * NOTE TO DEVELOPERS: For ease of maintenance, the current -->
   <!-- * manpages stylesheets use the mode="prevent.line.breaking" -->
-  <!-- * templates for *anything and everything* that needs to have -->
+  <!-- * templates for anything and everything that needs to have -->
   <!-- * embedded spaces turned into no-break spaces in output - in -->
   <!-- * order to prevent that output from getting broken across lines -->
   <!-- * -->
@@ -95,7 +152,7 @@
     <xsl:if test="$man.hyphenate != 0 and
                   not(ancestor::cmdsynopsis) and
                   not(ancestor::funcsynopsis)">
-      <xsl:text>&#x2593;%</xsl:text>
+      <xsl:text>\%</xsl:text>
     </xsl:if>
   </xsl:template>
 
@@ -112,14 +169,14 @@
     <xsl:variable name="dot-content">
       <xsl:call-template name="string.subst">
         <xsl:with-param name="string" select="$content"/>
-        <xsl:with-param name="target" select="'.'"/>
-        <xsl:with-param name="replacement" select="'&#x2302;'"/>
+        <xsl:with-param name="target" select="'\&amp;.'"/>
+        <xsl:with-param name="replacement" select="'.'"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:call-template name="string.subst">
       <xsl:with-param name="string" select="$dot-content"/>
-      <xsl:with-param name="target" select="'-'"/>
-      <xsl:with-param name="replacement" select="'&#x2591;'"/>
+      <xsl:with-param name="target" select="'\-'"/>
+      <xsl:with-param name="replacement" select="'-'"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -128,27 +185,38 @@
   <!-- * The nested-section-title template is called for refsect3, and any -->
   <!-- * refsection nested more than 2 levels deep. -->
   <xsl:template name="nested-section-title">
-    <!-- * The next few lines are some arcane roff code to control line -->
-    <!-- * spacing after headings. -->
-    <xsl:text>&#x2302;sp&#10;</xsl:text>
-    <xsl:text>&#x2302;it 1 an&#x2591;trap&#10;</xsl:text>
-    <xsl:text>&#x2302;nr an&#x2591;no&#x2591;space&#x2591;flag 1&#10;</xsl:text>
-    <xsl:text>&#x2302;nr an&#x2591;break&#x2591;flag 1&#10;</xsl:text>
-    <xsl:text>&#x2302;br&#10;</xsl:text>
-    <!-- * make title wrapper so that we can use mode="bold" template to -->
-    <!-- * apply character formatting to it -->
+    <xsl:text>.sp&#10;</xsl:text>
+    <xsl:call-template name="pinch.together"/>
+    <xsl:text>.ps +1&#10;</xsl:text>
+    <xsl:call-template name="make.bold.title"/>
+  </xsl:template>
+
+  <xsl:template name="pinch.together">
+    <!-- * arcane roff code to suppress line spacing after headings -->
+    <xsl:text>.it 1 an-trap&#10;</xsl:text>
+    <xsl:text>.nr an-no-space-flag 1&#10;</xsl:text>
+    <xsl:text>.nr an-break-flag 1&#10;</xsl:text>
+    <xsl:text>.br&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="make.bold.title">
+    <!-- * make title wrapper so that we can use "bold" template to apply -->
+    <!-- * character formatting to it -->
     <xsl:variable name="title.wrapper">
-      <bold><xsl:choose>
+      <xsl:choose>
         <xsl:when test="title">
           <xsl:value-of select="normalize-space(title[1])"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="." mode="object.title.markup.textonly"/>
         </xsl:otherwise>
-      </xsl:choose></bold>
+      </xsl:choose>
     </xsl:variable>
     <xsl:call-template name="mark.subheading"/>
-    <xsl:apply-templates mode="bold" select="exsl:node-set($title.wrapper)"/>
+    <xsl:call-template name="bold">
+      <xsl:with-param name="node" select="exsl:node-set($title.wrapper)"/>
+      <xsl:with-param name="context" select="."/>
+    </xsl:call-template>
     <xsl:text>&#10;</xsl:text>
     <xsl:call-template name="mark.subheading"/>
   </xsl:template>
@@ -172,7 +240,7 @@
         <xsl:when test="self::address|self::literallayout|self::programlisting|
                         self::screen|self::synopsis">
           <xsl:text>&#10;</xsl:text>
-          <xsl:text>&#x2302;sp&#10;</xsl:text>
+          <xsl:text>.sp&#10;</xsl:text>
           <xsl:call-template name="mark.up.block.start"/>
           <xsl:apply-templates select="."/>
         </xsl:when>
@@ -184,7 +252,8 @@
                         self::simplelist[@type !='inline']|
                         self::segmentedlist|
                         self::caution|self::important|
-                        self::note|self::tip|self::warning)">
+                        self::note|self::tip|self::warning|
+                        self::table|self::informaltable)">
           <xsl:call-template name="mark.up.block.start"/>
           <xsl:apply-templates select="."/>
         </xsl:when>
@@ -217,7 +286,9 @@
                     self::address or
                     self::literallayout or
                     self::programlisting or
-                    self::screen
+                    self::screen or
+                    self::table or
+                    self::informaltable
                     ]
                     )
                     ">
@@ -283,8 +354,11 @@
                       preceding-sibling::important|
                       preceding-sibling::note|
                       preceding-sibling::tip|
-                      preceding-sibling::warning)">
-          <xsl:text>&#x2302;RS</xsl:text>
+                      preceding-sibling::warning|
+                      preceding-sibling::table|
+                      preceding-sibling::informaltable
+                      )">
+          <xsl:text>.RS</xsl:text>
           <xsl:if test="not($list-indent = '')">
             <xsl:text> </xsl:text>
             <xsl:value-of select="$list-indent"/>
@@ -299,7 +373,7 @@
   <!-- * annotation; if so, and the block contains any nested block -->
   <!-- * content, then we know the mark.up.block.end template was already -->
   <!-- * called to generate a .RS macro to indent that nested block -->
-  <!-- * content; so we need to generated a .RE to set the margin back to -->
+  <!-- * content; so we need to generate a .RE to set the margin back to -->
   <!-- * where it was prior to the .RS call. -->
   <xsl:template name="mark.up.block.end">
     <xsl:if test="(ancestor::footnote
@@ -319,9 +393,11 @@
                     important|
                     note|
                     tip|
-                    warning">
+                    warning|
+                    table|
+                    informaltable">
         <xsl:text>&#10;</xsl:text>
-        <xsl:text>&#x2302;RE</xsl:text>
+        <xsl:text>.RE</xsl:text>
       <xsl:text>&#10;</xsl:text>
       </xsl:if>
     </xsl:if>
@@ -345,7 +421,7 @@
         <!-- * We don't want to monkey with single spaces or commas/periods -->
         <!-- * followed by spaces, because those are bits of text that are -->
         <!-- * actually generated by the person.name template itself (that -->
-        <!-- * is, they're not in the source. So, we preserve them. -->
+        <!-- * is, they're not in the source). So, we preserve them. -->
         <xsl:when test=". = ' ' or . = ', ' or . = '. '">
           <xsl:value-of select="."/>
         </xsl:when>
@@ -363,11 +439,14 @@
     <xsl:param name="lang"/>
     <xsl:param name="name.with.lang">
       <xsl:choose>
-        <xsl:when test="not($man.output.lang.in.name.enabled = 0)
-                        and ($man.output.subdirs.enabled = 0)">
-          <!-- * user has specified man.output.lang.in.name.enabled -->
-          <!-- * AND doesn't want output going into separate manN dirs, -->
-          <!-- * so we include the $lang value in the filename; e.g., -->
+        <xsl:when test="$lang != 'en'
+          and not($man.output.lang.in.name.enabled = 0)
+          and ($man.output.subdirs.enabled = 0 or
+          $man.output.in.separate.dir = 0)">
+          <!-- * $lang is not en (English) -->
+          <!-- * AND user has specified man.output.lang.in.name.enabled -->
+          <!-- * AND doesn't want output going into separate dirs, -->
+          <!-- * SO... we include the $lang value in the filename; e.g., -->
           <!-- * foo.ja.1 -->
           <xsl:value-of select="concat($name, '.', $lang)"/>
         </xsl:when>
@@ -389,7 +468,7 @@
             <xsl:variable name="lang.subdir">
               <xsl:if test="not($man.output.lang.in.name.enabled = 0)">
                 <!-- * user has man.output.lang.in.name.enabled set, so -->
-                <!-- * we need add a $lang subdir -->
+                <!-- * we need to add a $lang subdir -->
                 <xsl:value-of select="concat($lang, '/')"/>
               </xsl:if>
             </xsl:variable>
@@ -404,8 +483,8 @@
       </xsl:if>
     </xsl:param>
     <xsl:call-template name="string.subst">
-      <!-- * Replace any spaces in filename with underscores & then append -->
-      <!-- * a dot plus a section number to create the man filename -->
+      <!-- * To create the man filename, replace any spaces in filename with -->
+      <!-- * underscores and then append a dot plus a section number. -->
       <xsl:with-param name="string"
                       select="concat($dirname,
                               normalize-space($name.with.lang),
@@ -414,17 +493,63 @@
       <xsl:with-param name="replacement" select="'_'"/>
     </xsl:call-template>
   </xsl:template>
-  
+
   <!-- ================================================================== -->
+
+  <xsl:template name="make.subheading">
+    <xsl:param name="title"/>
+    <xsl:call-template name="mark.subheading"/>
+    <xsl:text>.SH</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>"</xsl:text>
+    <xsl:choose>
+      <xsl:when test="not($man.output.better.ps.enabled = 0)">
+        <xsl:value-of select="$title"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="string.upper">
+          <xsl:with-param name="string" select="$title"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:text>"</xsl:text>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:call-template name="mark.subheading"/>
+  </xsl:template>
 
   <!-- * Put a horizontal rule or other divider around section titles -->
   <!-- * in roff source (just to make things easier to read). -->
   <xsl:template name="mark.subheading">
     <xsl:if test="$man.subheading.divider.enabled != 0">
-      <xsl:text>&#x2302;&#x2593;" </xsl:text>
+      <xsl:text>.\" </xsl:text>
       <xsl:value-of select="$man.subheading.divider"/>
       <xsl:text>&#10;</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <!-- ================================================================== -->
+
+  <xsl:template name="roff-if-else-start">
+    <xsl:param name="condition">n</xsl:param>
+    <xsl:text>.ie </xsl:text>
+    <xsl:value-of select="$condition"/>
+    <xsl:text> \{\&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="roff-if-start">
+    <xsl:param name="condition">n</xsl:param>
+    <xsl:text>.if </xsl:text>
+    <xsl:value-of select="$condition"/>
+    <xsl:text> \{\&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="roff-else">
+    <xsl:text>.\}&#10;</xsl:text>
+    <xsl:text>.el \{\&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="roff-if-end">
+    <xsl:text>.\}&#10;</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

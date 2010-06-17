@@ -3,7 +3,8 @@
                 xmlns:ng="http://docbook.org/docbook-ng"
                 xmlns:db="http://docbook.org/ns/docbook"
                 xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes="db ng exsl"
+                xmlns:exslt="http://exslt.org/common"
+                exclude-result-prefixes="db ng exsl exslt"
                 version='1.0'>
 
 <xsl:output method="html"
@@ -11,12 +12,12 @@
             indent="no"/>
 
 <!-- ********************************************************************
-     $Id: docbook.xsl 6536 2007-01-21 08:37:12Z xmldoc $
+     $Id: docbook.xsl 8399 2009-04-08 07:37:42Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -27,6 +28,7 @@
 <xsl:include href="../lib/lib.xsl"/>
 <xsl:include href="../common/l10n.xsl"/>
 <xsl:include href="../common/common.xsl"/>
+<xsl:include href="../common/utility.xsl"/>
 <xsl:include href="../common/labels.xsl"/>
 <xsl:include href="../common/titles.xsl"/>
 <xsl:include href="../common/subtitles.xsl"/>
@@ -58,6 +60,7 @@
 <xsl:include href="admon.xsl"/>
 <xsl:include href="component.xsl"/>
 <xsl:include href="biblio.xsl"/>
+<xsl:include href="biblio-iso690.xsl"/>
 <xsl:include href="glossary.xsl"/>
 <xsl:include href="block.xsl"/>
 <xsl:include href="task.xsl"/>
@@ -96,7 +99,7 @@
     <xsl:text>, but no template matches.</xsl:text>
   </xsl:message>
 
-  <font color="red">
+  <span style="color: red">
     <xsl:text>&lt;</xsl:text>
     <xsl:value-of select="name(.)"/>
     <xsl:text>&gt;</xsl:text>
@@ -104,7 +107,7 @@
     <xsl:text>&lt;/</xsl:text>
     <xsl:value-of select="name(.)"/>
     <xsl:text>&gt;</xsl:text>
-  </font>
+  </span>
 </xsl:template>
 
 <xsl:template match="text()">
@@ -117,6 +120,9 @@
   <xsl:attribute name="link">#0000FF</xsl:attribute>
   <xsl:attribute name="vlink">#840084</xsl:attribute>
   <xsl:attribute name="alink">#0000FF</xsl:attribute>
+  <xsl:if test="starts-with($writing.mode, 'rl')">
+    <xsl:attribute name="dir">rtl</xsl:attribute>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template name="head.content">
@@ -325,18 +331,28 @@ body { background-image: url('</xsl:text>
 </xsl:template>
 
 <xsl:template match="/">
+  <!-- * Get a title for current doc so that we let the user -->
+  <!-- * know what document we are processing at this point. -->
+  <xsl:variable name="doc.title">
+    <xsl:call-template name="get.doc.title"/>
+  </xsl:variable>
   <xsl:choose>
+    <!-- Hack! If someone hands us a DocBook V5.x or DocBook NG document,
+         toss the namespace and continue.  Use the docbook5 namespaced
+         stylesheets for DocBook5 if you don't want to use this feature.-->
     <!-- include extra test for Xalan quirk -->
-    <xsl:when test="(function-available('exsl:node-set') or
-                     contains(system-property('xsl:vendor'),
-                       'Apache Software Foundation'))
+    <xsl:when test="$exsl.node.set.available != 0
                     and (*/self::ng:* or */self::db:*)">
-      <!-- Hack! If someone hands us a DocBook V5.x or DocBook NG document,
-           toss the namespace and continue. Someday we'll reverse this logic
-           and add the namespace to documents that don't have one.
-           But not before the whole stylesheet has been converted to use
-           namespaces. i.e., don't hold your breath -->
-      <xsl:message>Stripping namespace from DocBook 5 document.</xsl:message>
+      <xsl:call-template name="log.message">
+        <xsl:with-param name="level">Note</xsl:with-param>
+        <xsl:with-param name="source" select="$doc.title"/>
+        <xsl:with-param name="context-desc">
+          <xsl:text>namesp. cut</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="message">
+          <xsl:text>stripped namespace before processing</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:variable name="nons">
         <xsl:apply-templates mode="stripNS"/>
       </xsl:variable>
@@ -350,7 +366,16 @@ body { background-image: url('</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
       -->
-      <xsl:message>Processing stripped document.</xsl:message>
+      <xsl:call-template name="log.message">
+        <xsl:with-param name="level">Note</xsl:with-param>
+        <xsl:with-param name="source" select="$doc.title"/>
+        <xsl:with-param name="context-desc">
+          <xsl:text>namesp. cut</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="message">
+          <xsl:text>processing stripped document</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:apply-templates select="exsl:node-set($nons)"/>
     </xsl:when>
     <!-- Can't process unless namespace removed -->

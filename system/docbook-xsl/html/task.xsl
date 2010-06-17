@@ -3,12 +3,12 @@
                 version="1.0">
 
 <!-- ********************************************************************
-     $Id: task.xsl 6434 2006-11-18 09:00:48Z bobstayton $
+     $Id: task.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -36,7 +36,7 @@
                               or self::titleabbrev)]"/>
 
   <div>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:call-template name="anchor"/>
 
     <xsl:if test="title and $placement = 'before'">

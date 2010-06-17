@@ -5,12 +5,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: math.xsl 6434 2006-11-18 09:00:48Z bobstayton $
+     $Id: math.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -23,7 +23,7 @@
 
 <xsl:template match="mathphrase">
   <span>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:apply-templates/>
   </span>
 </xsl:template>
@@ -253,9 +253,8 @@
 
 <xsl:template name="tex.math.output.delims">
   <xsl:variable name="pi.delims">
-    <xsl:call-template name="pi-attribute">
-      <xsl:with-param name="pis" select=".//processing-instruction('dbtex')"/>
-      <xsl:with-param name="attribute" select="'delims'"/>
+    <xsl:call-template name="pi.dbtex_delims">
+      <xsl:with-param name="node" select="descendant-or-self::*"/>
     </xsl:call-template>
   </xsl:variable>
   <xsl:variable name="result">

@@ -4,7 +4,7 @@
   xmlns:doc='http://nwalsh.com/xsl/documentation/1.0'
   exclude-result-prefixes='doc'>
 
-  <xsl:import href='http://docbook.sourceforge.net/release/xsl/current/lib/lib.xsl'/>
+  <xsl:import href='../../lib/lib.xsl'/>
 
   <doc:article xmlns=''>
     <articleinfo>
@@ -23,7 +23,7 @@
         </affiliation>
       </author>
 
-      <releaseinfo>$Id: default.xsl 3991 2004-11-10 06:51:55Z balls $</releaseinfo>
+      <releaseinfo>$Id: default.xsl 6567 2007-01-30 06:43:18Z xmldoc $</releaseinfo>
 
       <copyright>
         <year>2002</year>

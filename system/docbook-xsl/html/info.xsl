@@ -3,12 +3,12 @@
                 version='1.0'>
 
 <!-- ********************************************************************
-     $Id: info.xsl 6434 2006-11-18 09:00:48Z bobstayton $
+     $Id: info.xsl 8421 2009-05-04 07:49:49Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -24,7 +24,7 @@
 
 <xsl:template match="corpauthor">
   <span>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:apply-templates/>
   </span>
 </xsl:template>
@@ -33,7 +33,7 @@
 
 <xsl:template match="jobtitle">
   <span>
-    <xsl:apply-templates select="." mode="class.attribute"/>
+    <xsl:apply-templates select="." mode="common.html.attributes"/>
     <xsl:apply-templates/>
   </span>
 </xsl:template>

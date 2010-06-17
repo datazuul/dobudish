@@ -1,9 +1,14 @@
+# /Users/keith/work/docbook-dev/xsl/tools/bin is not in PATH, so add it
+if [ "${PATH#*/Users/keith/work/docbook-dev/xsl/tools/bin*}" = "$PATH" ]; then
+  PATH="/Users/keith/work/docbook-dev/xsl/tools/bin:$PATH"
+  export PATH
+fi
 if [ -z "$XML_CATALOG_FILES" ]; then
-  XML_CATALOG_FILES="/sandbox/docbook/trunk/xsl/catalog.xml"
+  XML_CATALOG_FILES="/Users/keith/work/docbook-dev/xsl/catalog.xml"
 else
-  # /sandbox/docbook/trunk/xsl/catalog.xml is not in XML_CATALOG_FILES, so add it
-  if [ "${XML_CATALOG_FILES#*/sandbox/docbook/trunk/xsl/catalog.xml*}" = "$XML_CATALOG_FILES" ]; then
-    XML_CATALOG_FILES="/sandbox/docbook/trunk/xsl/catalog.xml $XML_CATALOG_FILES"
+  # /Users/keith/work/docbook-dev/xsl/catalog.xml is not in XML_CATALOG_FILES, so add it
+  if [ "${XML_CATALOG_FILES#*/Users/keith/work/docbook-dev/xsl/catalog.xml*}" = "$XML_CATALOG_FILES" ]; then
+    XML_CATALOG_FILES="/Users/keith/work/docbook-dev/xsl/catalog.xml $XML_CATALOG_FILES"
   fi
 fi
 # /etc/xml/catalog exists but is not in XML_CATALOG_FILES, so add it
@@ -13,11 +18,11 @@ fi
 export XML_CATALOG_FILES
 
 if [ -z "$SGML_CATALOG_FILES" ]; then
-  SGML_CATALOG_FILES="/sandbox/docbook/trunk/xsl/catalog"
+  SGML_CATALOG_FILES="/Users/keith/work/docbook-dev/xsl/catalog"
 else
-  # /sandbox/docbook/trunk/xsl/catalog is not in SGML_CATALOG_FILES, so add it
-  if [ "${SGML_CATALOG_FILES#*/sandbox/docbook/trunk/xsl/catalog}" = "$SGML_CATALOG_FILES" ]; then
-    SGML_CATALOG_FILES="/sandbox/docbook/trunk/xsl/catalog:$SGML_CATALOG_FILES"
+  # /Users/keith/work/docbook-dev/xsl/catalog is not in SGML_CATALOG_FILES, so add it
+  if [ "${SGML_CATALOG_FILES#*/Users/keith/work/docbook-dev/xsl/catalog}" = "$SGML_CATALOG_FILES" ]; then
+    SGML_CATALOG_FILES="/Users/keith/work/docbook-dev/xsl/catalog:$SGML_CATALOG_FILES"
   fi
 fi
 # /etc/sgml/catalog exists but is not in SGML_CATALOG_FILES, so add it
@@ -28,11 +33,11 @@ export SGML_CATALOG_FILES
 
 
 if [ -z "$CLASSPATH" ]; then
-  CLASSPATH="/home/mikes/.resolver"
+  CLASSPATH="/etc/xml/resolver"
 else
-  # /home/mikes/.resolver is not in CLASSPATH, so add it
-  if [ "${CLASSPATH#*/home/mikes/.resolver*}" = "$CLASSPATH" ]; then
-    CLASSPATH="/home/mikes/.resolver:$CLASSPATH"
+  # /etc/xml/resolver is not in CLASSPATH, so add it
+  if [ "${CLASSPATH#*/etc/xml/resolver*}" = "$CLASSPATH" ]; then
+    CLASSPATH="/etc/xml/resolver:$CLASSPATH"
   fi
 fi
 export CLASSPATH

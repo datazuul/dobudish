@@ -5,12 +5,12 @@
                 version="1.0">
 
 <!-- ********************************************************************
-     $Id: table.xsl 6482 2007-01-08 03:32:20Z bobstayton $
+     $Id: table.xsl 8392 2009-04-01 08:47:55Z bobstayton $
      ********************************************************************
 
      This file is part of the XSL DocBook Stylesheet distribution.
-     See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-     and other information.
+     See ../README or http://docbook.sf.net/release/xsl/current/ for
+     copyright and other information.
 
      ******************************************************************** -->
 
@@ -123,24 +123,24 @@
 
 <doc:template name="entry.colnum" xmlns="">
 <refpurpose>Determine the column number in which a given entry occurs</refpurpose>
-<refdescription>
-<para>If an <sgmltag>entry</sgmltag> has a
-<sgmltag class="attribute">colname</sgmltag> or
-<sgmltag class="attribute">namest</sgmltag> attribute, this template
+<refdescription id="entry.colnum-desc">
+<para>If an <tag>entry</tag> has a
+<tag class="attribute">colname</tag> or
+<tag class="attribute">namest</tag> attribute, this template
 will determine the number of the column in which the entry should occur.
-For other <sgmltag>entry</sgmltag>s, nothing is returned.</para>
+For other <tag>entry</tag>s, nothing is returned.</para>
 </refdescription>
-<refparameter>
+<refparameter id="entry.colnum-params">
 <variablelist>
 <varlistentry><term>entry</term>
 <listitem>
-<para>The <sgmltag>entry</sgmltag>-element which is to be tested.</para>
+<para>The <tag>entry</tag>-element which is to be tested.</para>
 </listitem>
 </varlistentry>
 </variablelist>
 </refparameter>
 
-<refreturn>
+<refreturn id="entry.colnum-returns">
 <para>This template returns the column number if it can be determined,
 or 0 (the empty string)</para>
 </refreturn>
@@ -254,10 +254,11 @@ or 0 (the empty string)</para>
   <xsl:param name="attribute" select="'colsep'"/>
 
   <xsl:variable name="tgroup" select="$row/parent::*/parent::tgroup[1]"/>
+  <xsl:variable name="tbody" select="$row/parent::*[1]"/>
 
   <xsl:variable name="table" select="($tgroup/ancestor::table
                                      |$tgroup/ancestor::informaltable
-				     |$entry/ancestor::entrytbl)[last()]"/>
+                                     |$entry/ancestor::entrytbl)[last()]"/>
 
   <xsl:variable name="entry.value">
     <xsl:call-template name="get-attribute">
@@ -336,6 +337,13 @@ or 0 (the empty string)</para>
     </xsl:call-template>
   </xsl:variable>
 
+  <xsl:variable name="tbody.value">
+    <xsl:call-template name="get-attribute">
+      <xsl:with-param name="element" select="$tbody"/>
+      <xsl:with-param name="attribute" select="$attribute"/>
+    </xsl:call-template>
+  </xsl:variable>
+
   <xsl:variable name="table.value">
     <xsl:call-template name="get-attribute">
       <xsl:with-param name="element" select="$table"/>
@@ -383,6 +391,9 @@ or 0 (the empty string)</para>
     <xsl:when test="$calc.colvalue != ''">
       <xsl:value-of select="$calc.colvalue"/>
     </xsl:when>
+    <xsl:when test="$tbody.value != ''">
+      <xsl:value-of select="$tbody.value"/>
+    </xsl:when>
     <xsl:when test="$tgroup.value != ''">
       <xsl:value-of select="$tgroup.value"/>
     </xsl:when>
@@ -400,7 +411,7 @@ or 0 (the empty string)</para>
   <xsl:param name="attribute" select="'colname'"/>
   <xsl:param name="colspec.ancestor" 
              select="(ancestor::tgroup|ancestor::entrytbl)
-	             [position() = last()]"/>
+                     [position() = last()]"/>
   <xsl:param name="colspecs" select="$colspec.ancestor/colspec"/>
   <xsl:param name="count" select="1"/>
 
@@ -482,7 +493,7 @@ or 0 (the empty string)</para>
 
   <xsl:variable name="table" 
                 select="($node/ancestor-or-self::table | 
-                         $node/ancestor-or-self::informaltable)[1]"/>
+                         $node/ancestor-or-self::informaltable)[last()]"/>
 
   <xsl:variable name="tabstyle">
     <xsl:choose>

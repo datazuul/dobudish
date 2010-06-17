@@ -10,7 +10,7 @@
                 exclude-result-prefixes="doc exsl set">
 
 <!-- ********************************************************************
-     $Id: htmlhelp.xsl 6295 2006-09-13 10:52:48Z kosek $
+     $Id: htmlhelp.xsl 6569 2007-01-30 07:03:13Z xmldoc $
      ******************************************************************** 
 
      This stylesheet can convert DocBook Slides document type into HTML Help.
@@ -18,7 +18,7 @@
      ******************************************************************** -->
 
 <xsl:import href="../html/plain.xsl"/>
-<xsl:include href="http://docbook.sourceforge.net/release/xsl/current/htmlhelp/htmlhelp-common.xsl"/>
+<xsl:include href="../../htmlhelp/htmlhelp-common.xsl"/>
 
 <xsl:param name="keyboard.nav" select="0"/>
 <xsl:param name="htmlhelp.default.topic" select="'index.html'"/>
