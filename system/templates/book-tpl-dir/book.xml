@@ -17,7 +17,7 @@
 <!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA -->
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-          "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+          "http://www.docbook.org/xml/4.5/docbookx.dtd"
   [
     <!ENTITY % global.entities SYSTEM "../../../system/custom-xsl/global-entities.xml">
     %global.entities;
